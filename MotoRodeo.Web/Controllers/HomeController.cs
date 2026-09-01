@@ -1,25 +1,37 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MotoRodeo.Web.Models;
-using System.Diagnostics;
 
-namespace MotoRodeo.Web.Controllers
+namespace MotoRodeo.Web.Controllers;
+
+/// <summary>
+/// Точка входа и страница ошибок приложения.
+/// </summary>
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    /// <summary>
+    /// Перенаправляет аутентифицированного пользователя к списку событий, иначе — на страницу входа.
+    /// </summary>
+    /// <returns>Перенаправление на список событий или страницу входа.</returns>
+    [AllowAnonymous]
+    public IActionResult Index()
     {
-        public IActionResult Index()
+        if (User.Identity?.IsAuthenticated == true)
         {
-            return View();
+            return RedirectToAction("Index", "Events");
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        return RedirectToAction("Login", "Account");
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    /// <summary>
+    /// Отображает страницу ошибки с сообщением из параметра, TempData или значением по умолчанию.
+    /// </summary>
+    /// <param name="message">Текст ошибки для отображения пользователю.</param>
+    /// <returns>Представление страницы ошибки.</returns>
+    [AllowAnonymous]
+    public IActionResult Error(string? message)
+    {
+        ViewBag.Message = message ?? TempData["Error"] as string ?? "Произошла ошибка.";
+        return View();
     }
 }

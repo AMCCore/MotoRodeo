@@ -1,0 +1,25 @@
+@model IReadOnlyList<AccountListItemDto>
+@{
+    ViewData["Title"] = "Пользователи";
+    var allRights = Enum.GetValues<AccountRightEnum>();
+}
+<h1 class="h4 mb-3">Права пользователей</h1>
+@foreach (var acc in Model)
+{
+    <form asp-action="Save" method="post" class="card mb-3">
+        <div class="card-body">
+            <input type="hidden" name="AccountId" value="@acc.Id" />
+            <p class="fw-semibold mb-1">@acc.Name</p>
+            <p class="small text-muted">@acc.Login</p>
+            @foreach (var right in allRights)
+            {
+                var check = acc.Rights.Contains(right);
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="Rights" value="@right" checked="@check" id="@acc.Id-@right" />
+                    <label class="form-check-label" for="@acc.Id-@right">@right</label>
+                </div>
+            }
+            <button type="submit" class="btn btn-primary w-100 py-3 mt-2">Сохранить</button>
+        </div>
+    </form>
+}

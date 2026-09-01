@@ -1,36 +1,72 @@
-namespace MotoRodeo.Web
+using DMCorp.Framework.Basics.DAL;
+using DMCorp.Framework.Basics.Security;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using MotoRodeo.BL;
+using MotoRodeo.BL.Jobs;
+using MotoRodeo.DAL;
+using MotoRodeo.DAL.Context;
+using MotoRodeo.Web.Filters;
+using MotoRodeo.Web.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllersWithViews(options =>
 {
-    public class Program
+    options.Filters.Add<DomainExceptionFilter>();
+});
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMotoRodeoDal(builder.Configuration);
+builder.Services.AddMotoRodeoBl();
+builder.Services.Configure<EventOptions>(builder.Configuration.GetSection(EventOptions.SectionName));
+builder.Services.AddScoped<IAdvancedSecurityService, SecurityService>();
+builder.Services.AddHostedService<CloseRegistrationHostedService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        x.Cookie.HttpOnly = true;
+        x.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        x.Cookie.SameSite = SameSiteMode.Strict;
+        x.LoginPath = "/Account/Login";
+        x.AccessDeniedPath = "/Account/Login";
+        x.SlidingExpiration = true;
+        x.ExpireTimeSpan = TimeSpan.FromHours(12);
+    });
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+var app = builder.Build();
 
-            var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
-            app.UseHttpsRedirection();
-            app.UseRouting();
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapStaticAssets();
+app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
 
-            app.UseAuthorization();
-
-            app.MapStaticAssets();
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
-
-            app.Run();
-        }
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MotoRodeoContext>();
+    await db.Database.MigrateAsync();
+    if (app.Environment.IsDevelopment())
+    {
+        var seed = app.Configuration.GetSection("Seed");
+        var uw = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        uw.SeedData(
+            seed["AdminLogin"] ?? "admin",
+            seed["AdminPassword"] ?? "admin123",
+            seed["AdminName"] ?? "Администратор");
     }
 }
+
+app.Run();

@@ -1,50 +1,63 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using DMCorp.Framework.Basics.Security
+@using MotoRodeo.DAL.Enums
+@inject IAdvancedSecurityService Security
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MotoRodeo.Web</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>@(ViewData["Title"] ?? "МотоРодео")</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MotoRodeo.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MotoRodeo.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-controller="Events" asp-action="Index">МотоРодео</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu" aria-label="Меню">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="menu">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Меню</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+                </div>
+                <div class="offcanvas-body">
+                    @if (Security.IsAuthenticated)
+                    {
+                        <p class="text-white-50">@User.Identity?.Name</p>
+                        <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Events" asp-action="Index">События</a>
+                        @if (Security.HasRight(AccountRightEnum.ManageEvents))
+                        {
+                            <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Events" asp-action="Create">Новое событие</a>
+                        }
+                        @if (Security.IsAdmin)
+                        {
+                            <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Accounts" asp-action="Index">Пользователи</a>
+                        }
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-warning w-100 py-3">Выйти</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Account" asp-action="Login">Вход</a>
+                        <a class="btn btn-primary w-100 py-3" asp-controller="Account" asp-action="Register">Регистрация</a>
+                    }
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MotoRodeo.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    </nav>
+    <main class="container py-3">
+        @if (TempData["Error"] is string err)
+        {
+            <div class="alert alert-danger">@err</div>
+        }
+        @RenderBody()
+    </main>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

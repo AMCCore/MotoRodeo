@@ -1,0 +1,26 @@
+@model LoginForm
+@{
+    ViewData["Title"] = "Вход";
+}
+<h1 class="h4 mb-3">Вход</h1>
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+<form method="post" asp-action="Login">
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="mb-3">
+        <label asp-for="Login" class="form-label"></label>
+        <input asp-for="Login" class="form-control" autocomplete="username" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label"></label>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Войти</button>
+    <a class="btn btn-outline-secondary w-100 py-3" asp-action="Register">Регистрация</a>
+</form>

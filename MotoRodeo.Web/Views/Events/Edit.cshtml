@@ -1,0 +1,77 @@
+@model EventEditForm
+@{
+    ViewData["Title"] = Model.Id == null ? "Новое событие" : "Событие";
+}
+<h1 class="h4 mb-3">@(Model.Id == null ? "Новое событие" : "Редактирование")</h1>
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Place" class="form-label"></label>
+        <input asp-for="Place" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="EventDateLocal" class="form-label"></label>
+        <input asp-for="EventDateLocal" class="form-control" type="datetime-local" id="event-date" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegistrationClosesAtLocal" class="form-label"></label>
+        <input asp-for="RegistrationClosesAtLocal" class="form-control" type="datetime-local" id="registration-closes-at" />
+        @if (Model.Id == null)
+        {
+            <div class="form-text">Пустое значение: начало события минус @((ViewBag.DefaultRegistrationClosesDaysBefore as int?) ?? 2) дн.</div>
+        }
+    </div>
+    <div class="mb-3">
+        <label asp-for="GroupCount" class="form-label"></label>
+        <input asp-for="GroupCount" class="form-control" type="number" min="1" />
+    </div>
+    <fieldset class="mb-3">
+        <legend class="h6">Судьи</legend>
+        <p class="form-text mt-0">Участниками становятся все, кто зарегистрировался на событие.</p>
+        @if (Model.JudgeCandidates.Count == 0)
+        {
+            <p class="text-muted mb-0">Нет пользователей с правом судить заезды.</p>
+        }
+        @foreach (var acc in Model.JudgeCandidates)
+        {
+            var check = Model.JudgeIds.Contains(acc.Id);
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="JudgeIds" value="@acc.Id" checked="@check" id="j-@acc.Id" />
+                <label class="form-check-label" for="j-@acc.Id">@acc.Name</label>
+            </div>
+        }
+    </fieldset>
+    <button type="submit" class="btn btn-primary w-100 py-3">Сохранить</button>
+</form>
+@section Scripts {
+    @if (Model.Id == null)
+    {
+        var days = (ViewBag.DefaultRegistrationClosesDaysBefore as int?) ?? 2;
+        <script>
+            (function () {
+                var days = @days;
+                var $event = $("#event-date");
+                var $closes = $("#registration-closes-at");
+                var custom = false;
+                $closes.on("input", function () { custom = true; });
+                $event.on("change", function () {
+                    if (custom || !$event.val()) return;
+                    var d = new Date($event.val());
+                    d.setDate(d.getDate() - days);
+                    var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+                    var local = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate())
+                        + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+                    $closes.val(local);
+                });
+            })();
+        </script>
+    }
+}
