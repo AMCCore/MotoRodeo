@@ -3,10 +3,18 @@ using MediatR;
 namespace MotoRodeo.BL.Commands.Account;
 
 /// <summary>
-/// Команда регистрации нового пользователя.
+/// Команда регистрации нового пользователя с подтверждением по электронной почте.
 /// </summary>
-/// <param name="Name">Отображаемое имя.</param>
-/// <param name="Login">Логин для входа.</param>
-/// <param name="Password">Пароль в открытом виде (будет захеширован).</param>
-/// <returns>Идентификатор созданной учётной записи.</returns>
-public sealed record RegisterUserCommand(string FirstName, string LastName, string? Login, string Password) : IRequest<Guid>;
+/// <param name="FirstName">Имя.</param>
+/// <param name="LastName">Фамилия.</param>
+/// <param name="Nickname">Обращение/прозвище.</param>
+/// <param name="Email">Электронная почта (логин).</param>
+/// <param name="Password">Пароль в открытом виде.</param>
+/// <param name="ConfirmationLinkFactory">Фабрика абсолютной ссылки подтверждения по Id учётной записи.</param>
+public sealed record RegisterUserCommand(
+    string FirstName,
+    string LastName,
+    string? Nickname,
+    string Email,
+    string Password,
+    Func<Guid, string> ConfirmationLinkFactory) : IRequest;

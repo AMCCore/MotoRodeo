@@ -3,7 +3,6 @@ using DMCorp.Framework.Basics.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL;
-using MotoRodeo.BL.Jobs;
 using MotoRodeo.DAL;
 using MotoRodeo.DAL.Context;
 using MotoRodeo.Web.Filters;
@@ -22,6 +21,19 @@ Environment.SetEnvironmentVariable("DefaultRegistrationClosesDaysBefore", config
 Environment.SetEnvironmentVariable("AdminLogin", configuration.GetValue<string>("AdminLogin"));
 Environment.SetEnvironmentVariable("AdminPassword", configuration.GetValue<string>("AdminPassword"));
 Environment.SetEnvironmentVariable("AdminName", configuration.GetValue<string>("AdminName"));
+Environment.SetEnvironmentVariable("SmtpHost", configuration.GetValue<string>("SmtpHost"));
+Environment.SetEnvironmentVariable("SmtpPort", configuration.GetValue<string>("SmtpPort"));
+Environment.SetEnvironmentVariable("SmtpUser", configuration.GetValue<string>("SmtpUser"));
+Environment.SetEnvironmentVariable("SmtpPassword", configuration.GetValue<string>("SmtpPassword"));
+Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("SmtpFrom"));
+Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
+Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
+Environment.SetEnvironmentVariable("EmailTemplatePasswordReset", configuration.GetValue<string>("EmailTemplatePasswordReset"));
+Environment.SetEnvironmentVariable("EmailTemplateNewPassword", configuration.GetValue<string>("EmailTemplateNewPassword"));
+Environment.SetEnvironmentVariable("EmailTemplateRegistration", configuration.GetValue<string>("EmailTemplateRegistration"));
+Environment.SetEnvironmentVariable("EmailSubjectPasswordReset", configuration.GetValue<string>("EmailSubjectPasswordReset"));
+Environment.SetEnvironmentVariable("EmailSubjectNewPassword", configuration.GetValue<string>("EmailSubjectNewPassword"));
+Environment.SetEnvironmentVariable("EmailSubjectRegistration", configuration.GetValue<string>("EmailSubjectRegistration"));
 
 #endif
 
@@ -41,7 +53,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddMotoRodeoBl();
 builder.Services.AddScoped<IAdvancedSecurityService, SecurityService>();
-builder.Services.AddHostedService<CloseRegistrationHostedService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>

@@ -27,7 +27,6 @@ public sealed class GetAccountWithRightsCommandHandler(IUnitOfWork unitOfWork)
             .Select(x => new AccountWithRightsDto
             {
                 AccountId = x.Id,
-                Name = x.LastName,
                 Login = x.AccountLogins
                     .Where(l => l.AccountLoginType == AccountLoginTypeEnum.Login)
                     .Select(l => l.Login)

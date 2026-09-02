@@ -13,11 +13,6 @@ public sealed class AccountWithRightsDto
     public Guid AccountId { get; set; }
 
     /// <summary>
-    /// Отображаемое имя.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
     /// Логин для входа.
     /// </summary>
     public string Login { get; set; } = string.Empty;

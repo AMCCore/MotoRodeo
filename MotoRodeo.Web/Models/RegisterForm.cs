@@ -8,7 +8,7 @@ namespace MotoRodeo.Web.Models;
 public sealed class RegisterForm
 {
     /// <summary>
-    /// Отображаемое имя пользователя.
+    /// Имя пользователя.
     /// </summary>
     [Required]
     [Display(Name = "Имя")]
@@ -16,7 +16,7 @@ public sealed class RegisterForm
     public string FirstName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Отображаемая фамилия пользователя.
+    /// Фамилия пользователя.
     /// </summary>
     [Required]
     [Display(Name = "Фамилия")]
@@ -24,18 +24,25 @@ public sealed class RegisterForm
     public string LastName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Уникальный логин для входа.
+    /// Обращение/прозвище.
+    /// </summary>
+    [Display(Name = "Обращение / прозвище")]
+    [MaxLength(127)]
+    public string? Nickname { get; set; }
+
+    /// <summary>
+    /// Электронная почта (логин).
     /// </summary>
     [Required]
-    [Display(Name = "Логин")]
+    [EmailAddress]
+    [Display(Name = "Электронная почта")]
     [MaxLength(127)]
-    public string Login { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 
     /// <summary>
     /// Пароль новой учётной записи.
     /// </summary>
     [Required]
-    [MinLength(6)]
     [DataType(DataType.Password)]
     [Display(Name = "Пароль")]
     public string Password { get; set; } = string.Empty;
@@ -44,4 +51,9 @@ public sealed class RegisterForm
     /// Сообщение об ошибке регистрации для отображения на форме.
     /// </summary>
     public string? Error { get; set; }
+
+    /// <summary>
+    /// Информационное сообщение (например, после успешной регистрации).
+    /// </summary>
+    public string? Info { get; set; }
 }

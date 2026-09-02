@@ -69,6 +69,11 @@ public class MotoRodeoContext(DbContextOptions<MotoRodeoContext> options) : DbCo
     public DbSet<DBAccountRight> DBAccountRights { get; set; } = null!;
 
     /// <summary>
+    /// Таблица запросов на восстановление пароля.
+    /// </summary>
+    public DbSet<DBPasswordResetRequest> DBPasswordResetRequests { get; set; } = null!;
+
+    /// <summary>
     /// Таблица событий МотоРодео.
     /// </summary>
     public DbSet<DBEvent> DBEvents { get; set; } = null!;

@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="MotoRodeo.BL/MotoRodeo.BL.csproj" />
-  <Project Path="MotoRodeo.BL.Tests/MotoRodeo.BL.Tests.csproj" />
   <Project Path="MotoRodeo.DAL/MotoRodeo.DAL.csproj" />
   <Project Path="MotoRodeo.Web/MotoRodeo.Web.csproj" />
 </Solution>

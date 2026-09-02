@@ -12,7 +12,9 @@ public static class Seed
     /// <summary>
     /// Предопределённый идентификатор учётной записи администратора.
     /// </summary>
-    public static readonly Guid AdminAccountId = Guid.Parse("11111111-1111-4111-8111-111111111111");
+    public static readonly Guid AdminAccountId = Guid.Parse(Environment.GetEnvironmentVariable(nameof(AdminAccountId)) ?? throw new InvalidOperationException("AdminAccountId is not set."));
+    public static readonly string AdminAccountLogin = Environment.GetEnvironmentVariable(nameof(AdminAccountLogin)) ?? throw new InvalidOperationException("AdminAccountLogin is not set.");
+    public static readonly string AdminAccountPass = Environment.GetEnvironmentVariable(nameof(AdminAccountPass)) ?? throw new InvalidOperationException("AdminAccountPass is not set.");
 
     /// <summary>
     /// Выполняет инициализацию стартовых данных.
@@ -30,9 +32,9 @@ public static class Seed
             uw.AddEntity(new DBAccount
             {
                 Id = AdminAccountId,
-                Login = adminLogin,
-                FirstName = adminName,
-                LastName = string.Empty,
+                Login = AdminAccountLogin,
+                FirstName = "admin",
+                LastName = "admin",
                 Confirmed = true,
                 DateCreated = DateTimeOffset.UtcNow,
             });

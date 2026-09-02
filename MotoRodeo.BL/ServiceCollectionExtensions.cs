@@ -15,9 +15,7 @@ public static class ServiceCollectionExtensions
     /// <returns>Та же коллекция для цепочки вызовов.</returns>
     public static IServiceCollection AddMotoRodeoBl(this IServiceCollection services)
     {
-        services.AddSingleton<IClock, SystemClock>();
-        services.AddSingleton<IParticipantShuffler, CryptographicParticipantShuffler>();
-        services.AddScoped<EventGridBuilder>();
+        services.AddSingleton<IEmailSender, MailKitEmailSender>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly));
         return services;
     }

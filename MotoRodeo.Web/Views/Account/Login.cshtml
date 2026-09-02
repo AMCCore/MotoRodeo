@@ -11,7 +11,7 @@
     <input type="hidden" asp-for="ReturnUrl" />
     <div class="mb-3">
         <label asp-for="Login" class="form-label"></label>
-        <input asp-for="Login" class="form-control" autocomplete="username" />
+        <input asp-for="Login" class="form-control" autocomplete="username" type="email" />
     </div>
     <div class="mb-3">
         <label asp-for="Password" class="form-label"></label>
@@ -22,5 +22,6 @@
         <label asp-for="RememberMe" class="form-check-label"></label>
     </div>
     <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Войти</button>
+    <a class="btn btn-outline-secondary w-100 py-3 mb-2" asp-action="ForgotPassword">Восстановить пароль</a>
     <a class="btn btn-outline-secondary w-100 py-3" asp-action="Register">Регистрация</a>
 </form>

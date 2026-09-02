@@ -23,7 +23,10 @@ public sealed class GetMainAccountLoginQueryHandler(IUnitOfWork unitOfWork)
     public async Task<AccountLoginDto?> Handle(GetMainAccountLoginQuery request, CancellationToken cancellationToken)
     {
         var login = await unitOfWork.GetSet<DBAccountLogin>()
-            .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login && x.Login == request.Login && x.Account.Confirmed && x.Password != null)
+            .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login
+                        && x.Login == request.Login.Trim().ToLowerInvariant()
+                        && x.Account.Confirmed
+                        && x.Password != null)
             .Select(x => new AccountLoginDto { AccountId = x.AccountId, Password = x.Password! })
             .FirstOrDefaultAsync(cancellationToken);
         return login;

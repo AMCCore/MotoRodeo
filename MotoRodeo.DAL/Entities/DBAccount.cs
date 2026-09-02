@@ -75,4 +75,9 @@ public class DBAccount : IEntityBase, ISoftDeleteEntity, IEntityWithDateCreated
     /// Набор данных для входа пользователя.
     /// </summary>
     public virtual ICollection<DBAccountLogin> AccountLogins { get; set; } = new List<DBAccountLogin>();
+
+    /// <summary>
+    /// Запросы на восстановление пароля.
+    /// </summary>
+    public virtual ICollection<DBPasswordResetRequest> PasswordResetRequests { get; set; } = new List<DBPasswordResetRequest>();
 }

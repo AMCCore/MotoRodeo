@@ -13,7 +13,7 @@ using MotoRodeo.Web.Models;
 namespace MotoRodeo.Web.Controllers;
 
 /// <summary>
-/// Регистрация, вход и выход пользователей.
+/// Регистрация, вход, выход и запрос восстановления пароля.
 /// </summary>
 public class AccountController(IMediator mediator) : Controller
 {
@@ -82,11 +82,11 @@ public class AccountController(IMediator mediator) : Controller
     }
 
     /// <summary>
-    /// Создаёт учётную запись и выполняет автоматический вход.
+    /// Создаёт учётную запись и отправляет письмо для подтверждения регистрации.
     /// </summary>
     /// <param name="form">Данные формы регистрации.</param>
     /// <param name="token">Токен отмены операции.</param>
-    /// <returns>Форма с ошибкой или перенаправление к списку событий.</returns>
+    /// <returns>Форма с ошибкой или сообщение о необходимости подтвердить почту.</returns>
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
@@ -99,9 +99,22 @@ public class AccountController(IMediator mediator) : Controller
 
         try
         {
-            var id = await mediator.Send(new RegisterUserCommand(form.FirstName, form.LastName, form.Login, form.Password), token);
-            await SignInAsync(id, false, token);
-            return RedirectToAction("Index", "Events");
+            await mediator.Send(new RegisterUserCommand(
+                form.FirstName,
+                form.LastName,
+                form.Nickname,
+                form.Email,
+                form.Password,
+                id => Url.Action(
+                    "ConfirmRegistration",
+                    "Accounts",
+                    new { id },
+                    Request.Scheme)!), token);
+
+            return View(new RegisterForm
+            {
+                Info = "Учётная запись создана. Проверьте электронную почту для активации."
+            });
         }
         catch (DomainException ex)
         {
@@ -109,6 +122,38 @@ public class AccountController(IMediator mediator) : Controller
             form.Password = string.Empty;
             return View(form);
         }
+    }
+
+    /// <summary>
+    /// Отображает форму запроса восстановления пароля.
+    /// </summary>
+    [AllowAnonymous]
+    public IActionResult ForgotPassword()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Events");
+        }
+
+        return View(new ForgotPasswordForm());
+    }
+
+    /// <summary>
+    /// Создаёт запрос восстановления пароля и отправляет ссылку на почту, если учётная запись найдена.
+    /// </summary>
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordForm form, CancellationToken token)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(form);
+        }
+
+        await mediator.Send(new RequestPasswordResetCommand(form.Email, id => Url.Action("ConfirmPasswordReset", "Accounts", new { id }, Request.Scheme)!), token);
+        form.Info = "Cсылка для восстановления пароля отправлена на указанный email.";
+        return View(form);
     }
 
     /// <summary>
@@ -131,7 +176,7 @@ public class AccountController(IMediator mediator) : Controller
         {
             new(ClaimTypes.Role, JsonSerializer.Serialize(account.Rights.Select(a => a.GetEnumGuid()))),
             new(ClaimTypes.NameIdentifier, account.AccountId.ToString()),
-            new(ClaimTypes.Name, account.Name)
+            new(ClaimTypes.Name, account.Login)
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, null);

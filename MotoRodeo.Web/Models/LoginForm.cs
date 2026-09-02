@@ -8,10 +8,11 @@ namespace MotoRodeo.Web.Models;
 public sealed class LoginForm
 {
     /// <summary>
-    /// Логин учётной записи.
+    /// Электронная почта (логин).
     /// </summary>
     [Required]
-    [Display(Name = "Логин")]
+    [EmailAddress]
+    [Display(Name = "Электронная почта")]
     public string Login { get; set; } = string.Empty;
 
     /// <summary>
