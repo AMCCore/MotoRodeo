@@ -13,7 +13,15 @@ public sealed class RegisterForm
     [Required]
     [Display(Name = "Имя")]
     [MaxLength(127)]
-    public string Name { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Отображаемая фамилия пользователя.
+    /// </summary>
+    [Required]
+    [Display(Name = "Фамилия")]
+    [MaxLength(127)]
+    public string LastName { get; set; } = string.Empty;
 
     /// <summary>
     /// Уникальный логин для входа.

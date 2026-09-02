@@ -11,7 +11,7 @@ namespace MotoRodeo.DAL.Entities;
 /// </summary>
 [Table("AccountRights")]
 [Index(nameof(AccountId), nameof(Right), IsUnique = true)]
-public class DBAccountRight : IEntityBase
+public class DBAccountRight : IEntityBase, IEntityWithDateCreated
 {
     /// <summary>
     /// Уникальный идентификатор.
@@ -23,6 +23,11 @@ public class DBAccountRight : IEntityBase
     /// Метка последнего изменения записи.
     /// </summary>
     public long LastUpdateTick { get; set; }
+
+    /// <summary>
+    /// Дата и время создания записи.
+    /// </summary>
+    public DateTimeOffset DateCreated { get; set; }
 
     /// <summary>
     /// Право пользователя.

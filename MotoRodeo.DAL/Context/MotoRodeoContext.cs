@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using DMCorp.Framework.Basics.DAL;
 using DMCorp.Framework.Basics.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
 using MotoRodeo.DAL.Extensions;
@@ -14,6 +15,15 @@ namespace MotoRodeo.DAL.Context;
 public class MotoRodeoContext(DbContextOptions<MotoRodeoContext> options) : DbContext(options)
 {
     /// <summary>
+    /// Отключает автоматические индексы по FK: составные уникальные индексы уже покрывают ведущий столбец.
+    /// Непокрытые FK индексируются явно в <see cref="OnModelCreating"/>.
+    /// </summary>
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Remove(typeof(ForeignKeyIndexConvention));
+    }
+
+    /// <summary>
     /// Конфигурация сущностей и соглашений модели.
     /// </summary>
     /// <param name="modelBuilder">Построитель модели EF Core.</param>
@@ -21,25 +31,23 @@ public class MotoRodeoContext(DbContextOptions<MotoRodeoContext> options) : DbCo
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<DBAccount>().HasIndex(a => a.Name);
+        modelBuilder.Entity<DBAccountRight>().Property(d => d.Right).HasConversion(new GuidEnumConverterExtension<AccountRightEnum>());
 
-        modelBuilder.Entity<DBAccountRight>().Property(d => d.Right)
-            .HasConversion(new GuidEnumConverterExtension<AccountRightEnum>());
-        modelBuilder.Entity<DBAccountLogin>().Property(d => d.AccountLoginType)
-            .HasConversion(new GuidEnumConverterExtension<AccountLoginTypeEnum>());
-        modelBuilder.Entity<DBEvent>().Property(d => d.Status)
-            .HasConversion(new GuidEnumConverterExtension<EventStatusEnum>());
+        modelBuilder.Entity<DBAccountLogin>().Property(d => d.AccountLoginType).HasConversion(new GuidEnumConverterExtension<AccountLoginTypeEnum>());
+
+        modelBuilder.Entity<DBEvent>().Property(d => d.Status).HasConversion(new GuidEnumConverterExtension<EventStatusEnum>());
+
 
         modelBuilder.DisableCascadeDeleteConvention();
         modelBuilder.UseIdentityColumns();
 
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes().Select(x => x.ClrType)
-                     .Where(x => typeof(ISoftDeleteEntity).IsAssignableFrom(x)))
+        // Глобальный фильтр soft-delete: для сущностей с ISoftDeleteEntity скрываем записи с IsDeleted = true во всех запросах.
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes().Select(x => x.ClrType).Where(x => typeof(ISoftDeleteEntity).IsAssignableFrom(x)))
         {
             var parameter = Expression.Parameter(entityType, "e");
             var body = Expression.Equal(
                 Expression.Call(typeof(EF), nameof(EF.Property), [typeof(bool)], parameter,
-                    Expression.Constant("IsDeleted")),
+                Expression.Constant("IsDeleted")),
                 Expression.Constant(false));
             modelBuilder.Entity(entityType).HasQueryFilter(Expression.Lambda(body, parameter));
         }

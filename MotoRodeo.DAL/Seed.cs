@@ -30,7 +30,9 @@ public static class Seed
             uw.AddEntity(new DBAccount
             {
                 Id = AdminAccountId,
-                Name = adminName,
+                Login = adminLogin,
+                FirstName = adminName,
+                LastName = string.Empty,
                 Confirmed = true,
                 DateCreated = DateTimeOffset.UtcNow,
             });

@@ -40,7 +40,7 @@ public sealed class ExportParticipantsCsvQueryHandler(
                 .SelectMany(g => g.Members.Select(m => (
                     Group: g.Number,
                     m.StartNumber,
-                    m.Account.Name,
+                    m.Account.Login,
                     Login: m.Account.AccountLogins.FirstOrDefault(l => l.AccountLoginType == AccountLoginTypeEnum.Login)?.Login ?? string.Empty)))
                 .OrderBy(x => x.Group).ThenBy(x => x.StartNumber)
                 .ToList();
@@ -49,9 +49,9 @@ public sealed class ExportParticipantsCsvQueryHandler(
 
         var full = ev.Participants
             .Select(p => (
-                p.Account.Name,
+                p.Account.Login,
                 Login: p.Account.AccountLogins.FirstOrDefault(l => l.AccountLoginType == AccountLoginTypeEnum.Login)?.Login ?? string.Empty))
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.Login)
             .ToList();
         return ParticipantsCsv.Full(ev.Title, full);
     }

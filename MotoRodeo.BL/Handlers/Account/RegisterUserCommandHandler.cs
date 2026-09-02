@@ -23,22 +23,10 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork)
     /// <exception cref="DomainException">Некорректные данные или логин уже занят.</exception>
     public async Task<Guid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var name = request.Name.Trim();
-        var login = request.Login.Trim();
-        if (string.IsNullOrWhiteSpace(name) || name.Length > 127)
-        {
-            throw new DomainException("Укажите имя (до 127 символов).");
-        }
+        var firstName = request.FirstName.Trim();
+        var lastName = request.LastName.Trim();
+        var login = request.Login?.Trim();
 
-        if (string.IsNullOrWhiteSpace(login) || login.Length > 127)
-        {
-            throw new DomainException("Укажите логин (до 127 символов).");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 6)
-        {
-            throw new DomainException("Пароль должен быть не короче 6 символов.");
-        }
 
         var loginTaken = await unitOfWork.GetSet<DBAccountLogin>()
             .AnyAsync(x => x.Login == login && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken);
@@ -49,7 +37,9 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork)
 
         var account = new DBAccount
         {
-            Name = name,
+            FirstName = firstName,
+            LastName = lastName,
+            Login = login,
             Confirmed = true,
             DateCreated = DateTimeOffset.UtcNow
         };

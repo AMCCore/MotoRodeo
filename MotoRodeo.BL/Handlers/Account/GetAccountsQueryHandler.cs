@@ -26,11 +26,11 @@ public sealed class GetAccountsQueryHandler(IUnitOfWork unitOfWork, DMCorp.Frame
     {
         Security.Access.RequireAdmin(security);
         return await unitOfWork.GetSet<DBAccount>()
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.LastName)
             .Select(x => new AccountListItemDto
             {
                 Id = x.Id,
-                Name = x.Name,
+                Name = x.FirstName,
                 Login = x.AccountLogins
                     .Where(l => l.AccountLoginType == AccountLoginTypeEnum.Login)
                     .Select(l => l.Login)

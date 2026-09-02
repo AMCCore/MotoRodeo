@@ -1,6 +1,7 @@
+using DMCorp.Framework.Basics.DAL;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DMCorp.Framework.Basics.DAL;
 
 namespace MotoRodeo.DAL.Entities;
 
@@ -8,6 +9,7 @@ namespace MotoRodeo.DAL.Entities;
 /// Учетная запись пользователя.
 /// </summary>
 [Table("Accounts")]
+[Index(nameof(FirstName), nameof(LastName), nameof(Login), IsUnique = true)]
 public class DBAccount : IEntityBase, ISoftDeleteEntity, IEntityWithDateCreated
 {
     /// <summary>
@@ -38,11 +40,26 @@ public class DBAccount : IEntityBase, ISoftDeleteEntity, IEntityWithDateCreated
     public DateTimeOffset DateCreated { get; set; }
 
     /// <summary>
-    /// Позывной/прозвище (но не login).
+    /// Имя
     /// </summary>
     [Required]
     [MaxLength(127)]
-    public string Name { get; set; } = string.Empty;
+    public required string FirstName { get; set; }
+
+    /// <summary>
+    /// Фамилия
+    /// </summary>
+    [Required]
+    [MaxLength(127)]
+    public required string LastName { get; set; }
+
+
+    /// <summary>
+    /// Позывной/прозвище (но не login).
+    /// </summary>
+    [MaxLength(127)]
+    public string? Login { get; set; }
+
 
     /// <summary>
     /// Аккаунт подтверждён.

@@ -99,7 +99,7 @@ public class AccountController(IMediator mediator) : Controller
 
         try
         {
-            var id = await mediator.Send(new RegisterUserCommand(form.Name, form.Login, form.Password), token);
+            var id = await mediator.Send(new RegisterUserCommand(form.FirstName, form.LastName, form.Login, form.Password), token);
             await SignInAsync(id, false, token);
             return RedirectToAction("Index", "Events");
         }

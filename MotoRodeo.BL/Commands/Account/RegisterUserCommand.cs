@@ -9,4 +9,4 @@ namespace MotoRodeo.BL.Commands.Account;
 /// <param name="Login">Логин для входа.</param>
 /// <param name="Password">Пароль в открытом виде (будет захеширован).</param>
 /// <returns>Идентификатор созданной учётной записи.</returns>
-public sealed record RegisterUserCommand(string Name, string Login, string Password) : IRequest<Guid>;
+public sealed record RegisterUserCommand(string FirstName, string LastName, string? Login, string Password) : IRequest<Guid>;

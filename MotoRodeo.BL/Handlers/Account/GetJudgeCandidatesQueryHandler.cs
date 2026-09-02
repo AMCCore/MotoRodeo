@@ -28,11 +28,11 @@ public sealed class GetJudgeCandidatesQueryHandler(IUnitOfWork unitOfWork, IAdva
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
         return await unitOfWork.GetSet<DBAccount>()
             .Where(x => x.AccountRights.Any(r => r.Right == AccountRightEnum.CanJudge))
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.LastName)
             .Select(x => new NamedAccountDto
             {
                 Id = x.Id,
-                Name = x.Name
+                Name = x.FirstName + " " + x.LastName
             })
             .ToListAsync(cancellationToken);
     }

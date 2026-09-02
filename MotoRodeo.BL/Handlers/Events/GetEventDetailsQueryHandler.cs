@@ -65,23 +65,23 @@ public sealed class GetEventDetailsQueryHandler(
                 && EventSchedule.IsRegistrationOpen(ev.RegistrationClosesAt, now),
             IsParticipant = ev.Participants.Any(p => p.AccountId == security.CurrentAccountId),
             IsJudge = isJudge,
-            Participants = ev.Participants.Select(p => new NamedAccountDto { Id = p.AccountId, Name = p.Account.Name }).OrderBy(x => x.Name).ToList(),
-            Judges = ev.Judges.Select(j => new NamedAccountDto { Id = j.AccountId, Name = j.Account.Name }).OrderBy(x => x.Name).ToList(),
+            Participants = ev.Participants.Select(p => new NamedAccountDto { Id = p.AccountId, Name = p.Account.Login }).OrderBy(x => x.Name).ToList(),
+            Judges = ev.Judges.Select(j => new NamedAccountDto { Id = j.AccountId, Name = j.Account.Login }).OrderBy(x => x.Name).ToList(),
             Groups = ev.Groups.OrderBy(g => g.Number).Select(g => new EventGroupDto
             {
                 Number = g.Number,
                 Members = g.Members.OrderBy(m => m.StartNumber).Select(m => new GroupMemberDto
                 {
                     AccountId = m.AccountId,
-                    Name = m.Account.Name,
+                    Name = m.Account.Login,
                     StartNumber = m.StartNumber
                 }).ToList(),
                 Heats = g.Heats.OrderBy(h => h.Sequence).Select(h => new HeatDto
                 {
                     Sequence = h.Sequence,
                     MatchupId = h.MatchupId,
-                    LeaderName = h.Leader.Name,
-                    ChaserName = h.Chaser.Name
+                    LeaderName = h.Leader.Login,
+                    ChaserName = h.Chaser.Login
                 }).ToList()
             }).ToList()
         };
