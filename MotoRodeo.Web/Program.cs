@@ -11,14 +11,35 @@ using MotoRodeo.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var configuration = builder.Configuration;
+
+#if DEBUG
+
+Environment.SetEnvironmentVariable("DbConnection", configuration.GetValue<string>("DbConnection"));
+Environment.SetEnvironmentVariable("SecKey", configuration.GetValue<string>("SecKey"));
+Environment.SetEnvironmentVariable("LuckypennyLicenseKey", configuration.GetValue<string>("LuckypennyLicenseKey"));
+Environment.SetEnvironmentVariable("DefaultRegistrationClosesDaysBefore", configuration.GetValue<string>("DefaultRegistrationClosesDaysBefore"));
+Environment.SetEnvironmentVariable("AdminLogin", configuration.GetValue<string>("AdminLogin"));
+Environment.SetEnvironmentVariable("AdminPassword", configuration.GetValue<string>("AdminPassword"));
+Environment.SetEnvironmentVariable("AdminName", configuration.GetValue<string>("AdminName"));
+
+#endif
+
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<DomainExceptionFilter>();
 });
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddMotoRodeoDal(builder.Configuration);
+
+builder.Services.AddDbContext<MotoRodeoContext>(options => options.UseLazyLoadingProxies()
+.UseNpgsql(
+        Environment.GetEnvironmentVariable("DbConnection") ?? throw new ArgumentNullException("DbConnection")
+    //opts => opts.EnableRetryOnFailure()
+    ));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddMotoRodeoBl();
-builder.Services.Configure<EventOptions>(builder.Configuration.GetSection(EventOptions.SectionName));
 builder.Services.AddScoped<IAdvancedSecurityService, SecurityService>();
 builder.Services.AddHostedService<CloseRegistrationHostedService>();
 
@@ -34,6 +55,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         x.ExpireTimeSpan = TimeSpan.FromHours(12);
     });
 
+//---------------------------------------------
 var app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -53,20 +75,5 @@ app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<MotoRodeoContext>();
-    await db.Database.MigrateAsync();
-    if (app.Environment.IsDevelopment())
-    {
-        var seed = app.Configuration.GetSection("Seed");
-        var uw = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        uw.SeedData(
-            seed["AdminLogin"] ?? "admin",
-            seed["AdminPassword"] ?? "admin123",
-            seed["AdminName"] ?? "Администратор");
-    }
-}
 
 app.Run();

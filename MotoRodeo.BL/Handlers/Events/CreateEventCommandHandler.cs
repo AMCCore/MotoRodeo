@@ -1,7 +1,6 @@
 using DMCorp.Framework.Basics.DAL;
 using DMCorp.Framework.Basics.Security;
 using MediatR;
-using Microsoft.Extensions.Options;
 using MotoRodeo.BL.Commands.Events;
 using MotoRodeo.BL.Exceptions;
 using MotoRodeo.BL.Security;
@@ -16,8 +15,7 @@ namespace MotoRodeo.BL.Handlers.Events;
 /// </summary>
 public sealed class CreateEventCommandHandler(
     IUnitOfWork unitOfWork,
-    IAdvancedSecurityService security,
-    IOptions<EventOptions> eventOptions)
+    IAdvancedSecurityService security)
     : IRequestHandler<CreateEventCommand, Guid>
 {
     /// <summary>
@@ -31,8 +29,9 @@ public sealed class CreateEventCommandHandler(
     public async Task<Guid> Handle(CreateEventCommand request, CancellationToken cancellationToken)
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
+        var daysBefore = EventOptions.RegistrationClosesDaysBefore;
         var registrationClosesAt = request.RegistrationClosesAt
-            ?? EventSchedule.DefaultRegistrationClosesAt(request.EventDate, eventOptions.Value.DefaultRegistrationClosesDaysBefore);
+            ?? EventSchedule.DefaultRegistrationClosesAt(request.EventDate, daysBefore);
         EventMutation.ValidateFields(request.Title, request.Place, request.EventDate, registrationClosesAt, request.GroupCount);
         await EventMutation.ValidateJudgesAsync(unitOfWork, request.JudgeIds, participantIds: [], cancellationToken);
 

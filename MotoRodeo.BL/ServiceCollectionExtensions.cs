@@ -15,7 +15,6 @@ public static class ServiceCollectionExtensions
     /// <returns>Та же коллекция для цепочки вызовов.</returns>
     public static IServiceCollection AddMotoRodeoBl(this IServiceCollection services)
     {
-        services.AddOptions<EventOptions>();
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<IParticipantShuffler, CryptographicParticipantShuffler>();
         services.AddScoped<EventGridBuilder>();

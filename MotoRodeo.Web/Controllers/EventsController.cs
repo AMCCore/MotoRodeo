@@ -2,7 +2,6 @@ using DMCorp.Framework.Basics.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using MotoRodeo.BL;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Commands.Events;
@@ -17,7 +16,7 @@ namespace MotoRodeo.Web.Controllers;
 /// Просмотр и управление соревновательными событиями.
 /// </summary>
 [Authorize]
-public class EventsController(IMediator mediator, IAdvancedSecurityService security, IOptions<EventOptions> eventOptions) : Controller
+public class EventsController(IMediator mediator, IAdvancedSecurityService security) : Controller
 {
     /// <summary>
     /// Отображает список событий с учётом прав текущего пользователя.
@@ -55,7 +54,7 @@ public class EventsController(IMediator mediator, IAdvancedSecurityService secur
     public async Task<IActionResult> Create(CancellationToken token)
     {
         EnsureManage();
-        ViewBag.DefaultRegistrationClosesDaysBefore = eventOptions.Value.DefaultRegistrationClosesDaysBefore;
+        ViewBag.DefaultRegistrationClosesDaysBefore = EventOptions.RegistrationClosesDaysBefore;
         return View("Edit", await EmptyForm(token));
     }
 
@@ -71,7 +70,7 @@ public class EventsController(IMediator mediator, IAdvancedSecurityService secur
     {
         EnsureManage();
         form.JudgeCandidates = await mediator.Send(new GetJudgeCandidatesQuery(), token);
-        ViewBag.DefaultRegistrationClosesDaysBefore = eventOptions.Value.DefaultRegistrationClosesDaysBefore;
+        ViewBag.DefaultRegistrationClosesDaysBefore = EventOptions.RegistrationClosesDaysBefore;
         if (!ModelState.IsValid)
         {
             return View("Edit", form);
@@ -218,7 +217,7 @@ public class EventsController(IMediator mediator, IAdvancedSecurityService secur
     private EventEditForm EmptyForm(IReadOnlyList<MotoRodeo.BL.Dtos.NamedAccountDto> judgeCandidates)
     {
         var eventDate = DateTime.Now.AddDays(14);
-        var daysBefore = eventOptions.Value.DefaultRegistrationClosesDaysBefore;
+        var daysBefore = EventOptions.RegistrationClosesDaysBefore;
         return new EventEditForm
         {
             JudgeCandidates = judgeCandidates,

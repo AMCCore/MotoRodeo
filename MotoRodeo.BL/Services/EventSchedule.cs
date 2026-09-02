@@ -28,6 +28,5 @@ public static class EventSchedule
     /// <param name="registrationClosesAt">Момент закрытия регистрации.</param>
     /// <param name="now">Текущий момент.</param>
     /// <returns><c>true</c>, если регистрация ещё принимается.</returns>
-    public static bool IsRegistrationOpen(DateTimeOffset registrationClosesAt, DateTimeOffset now)
-        => now < registrationClosesAt;
+    public static bool IsRegistrationOpen(DateTimeOffset registrationClosesAt, DateTimeOffset now) => now < registrationClosesAt;
 }
