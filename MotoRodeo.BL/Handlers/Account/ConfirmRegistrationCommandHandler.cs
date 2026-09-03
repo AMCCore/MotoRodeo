@@ -21,7 +21,7 @@ public sealed class ConfirmRegistrationCommandHandler(IUnitOfWork unitOfWork) : 
         var account = await unitOfWork.Query<DBAccount>().FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken) ?? throw new Exception("Ссылка подтверждения регистрации недействительна.");
         if (account.Confirmed)
         {
-            return;
+            throw new Exception("Учётная запись уже подтверждена.");
         }
 
         account.Confirmed = true;

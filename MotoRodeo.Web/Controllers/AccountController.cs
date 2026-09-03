@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.Web.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -105,9 +106,9 @@ public class AccountController(IMediator mediator) : Controller
                 form.Email,
                 form.Password,
                 id => Url.Action(
-                    "ConfirmRegistration",
-                    "Accounts",
-                    new { id },
+                    nameof(ConfirmRegistration),
+                    "Account",
+                    new { AccountId = id },
                     Request.Scheme)!), token);
 
             return View(new RegisterForm
@@ -122,6 +123,37 @@ public class AccountController(IMediator mediator) : Controller
             return View(form);
         }
     }
+
+    /// <summary>
+    /// Подтверждает регистрацию по ссылке из письма.
+    /// </summary>
+    /// <param name="AccountId">Идентификатор учётной записи.</param>
+    /// <param name="token">Токен отмены операции.</param>
+    /// <returns>Страница успеха или общей ошибки подтверждения.</returns>
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("Confirm/{AccountId}")]
+    public async Task<IActionResult> ConfirmRegistration([Required] Guid AccountId, CancellationToken token = default)
+    {
+        try
+        {
+            await mediator.Send(new ConfirmRegistrationCommand(AccountId), token);
+            return View(new ConfirmRegistrationModel
+            {
+                Success = true,
+                Message = "Учётная запись подтверждена."
+            });
+        }
+        catch
+        {
+            return View(new ConfirmRegistrationModel
+            {
+                Success = false,
+                Message = "Не удалось подтвердить регистрацию."
+            });
+        }
+    }
+
 
     /// <summary>
     /// Отображает форму запроса восстановления пароля.
@@ -189,4 +221,6 @@ public class AccountController(IMediator mediator) : Controller
                 ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
             });
     }
+
+
 }
