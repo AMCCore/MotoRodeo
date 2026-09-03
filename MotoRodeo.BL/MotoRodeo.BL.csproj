@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Commands\Events\" />
+    <Folder Include="Exceptions\" />
     <Folder Include="Handlers\Events\" />
   </ItemGroup>
 

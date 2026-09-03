@@ -2,7 +2,6 @@ using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL.Commands.Account;
-using MotoRodeo.BL.Exceptions;
 using MotoRodeo.BL.Services;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
@@ -30,17 +29,17 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
 
         if (resetRequest == null)
         {
-            throw new DomainException("Ссылка восстановления пароля недействительна.");
+            throw new Exception("Ссылка восстановления пароля недействительна.");
         }
 
         if (resetRequest.IsUsed)
         {
-            throw new DomainException("Ссылка восстановления пароля уже была использована.");
+            throw new Exception("Ссылка восстановления пароля уже была использована.");
         }
 
         if (DateTimeOffset.UtcNow - resetRequest.DateCreated > ResetLinkLifetime)
         {
-            throw new DomainException("Срок действия ссылки восстановления пароля истёк.");
+            throw new Exception("Срок действия ссылки восстановления пароля истёк.");
         }
 
         var accountLogin = await unitOfWork.GetSet<DBAccountLogin>()
@@ -50,7 +49,7 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
 
         if (accountLogin == null)
         {
-            throw new DomainException("Учётная запись для восстановления не найдена.");
+            throw new Exception("Учётная запись для восстановления не найдена.");
         }
 
         var newPassword = PasswordGenerator.Generate();

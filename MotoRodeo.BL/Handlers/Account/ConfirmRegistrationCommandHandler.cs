@@ -2,7 +2,6 @@ using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL.Commands.Account;
-using MotoRodeo.BL.Exceptions;
 using MotoRodeo.DAL.Entities;
 
 namespace MotoRodeo.BL.Handlers.Account;
@@ -26,7 +25,7 @@ public sealed class ConfirmRegistrationCommandHandler(IUnitOfWork unitOfWork)
 
         if (account == null)
         {
-            throw new DomainException("Ссылка подтверждения регистрации недействительна.");
+            throw new Exception("Ссылка подтверждения регистрации недействительна.");
         }
 
         if (account.Confirmed)

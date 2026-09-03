@@ -23,7 +23,7 @@ public static class Seed
     /// <param name="adminLogin">Логин администратора.</param>
     /// <param name="adminPassword">Пароль администратора.</param>
     /// <param name="adminName">Отображаемое имя администратора.</param>
-    public static void SeedData(this IUnitOfWork uw, string adminLogin, string adminPassword, string adminName)
+    public static void SeedData(this IUnitOfWork uw)
     {
         uw.NotChangeLastUpdateTick = true;
 
@@ -42,16 +42,13 @@ public static class Seed
 
         if (!uw.GetSet<DBAccountLogin>().Any(x => x.AccountId == AdminAccountId && x.AccountLoginType == AccountLoginTypeEnum.Login))
         {
-            if (!string.IsNullOrEmpty(adminPassword) && !string.IsNullOrEmpty(adminLogin))
+            uw.AddEntity(new DBAccountLogin
             {
-                uw.AddEntity(new DBAccountLogin
-                {
-                    AccountId = AdminAccountId,
-                    AccountLoginType = AccountLoginTypeEnum.Login,
-                    Login = adminLogin,
-                    Password = BCrypt.Net.BCrypt.HashPassword(adminPassword, 11)
-                });
-            }
+                AccountId = AdminAccountId,
+                AccountLoginType = AccountLoginTypeEnum.Login,
+                Login = AdminAccountLogin,
+                Password = BCrypt.Net.BCrypt.HashPassword(AdminAccountPass, 11)
+            });
         }
 
         if (!uw.GetSet<DBAccountRight>().Any(x => x.AccountId == AdminAccountId && x.Right == AccountRightEnum.IsAdmin))

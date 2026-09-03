@@ -2,7 +2,6 @@ using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL.Commands.Account;
-using MotoRodeo.BL.Exceptions;
 using MotoRodeo.BL.Services;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
@@ -30,14 +29,14 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSen
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            throw new DomainException("Укажите адрес электронной почты.");
+            throw new Exception("Укажите адрес электронной почты.");
         }
 
         var emailTaken = await unitOfWork.GetSet<DBAccountLogin>()
             .AnyAsync(x => x.Login == email && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken);
         if (emailTaken)
         {
-            throw new DomainException("Пользователь с такой электронной почтой уже существует.");
+            throw new Exception("Пользователь с такой электронной почтой уже существует.");
         }
 
         var account = new DBAccount

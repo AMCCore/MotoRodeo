@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using MotoRodeo.BL.Exceptions;
 
 namespace MotoRodeo.Web.Filters;
 
@@ -32,7 +31,7 @@ public sealed class DomainExceptionFilter : IExceptionFilter
                 };
                 context.ExceptionHandled = true;
                 break;
-            case DomainException ex:
+            case Exception ex:
                 context.Result = new RedirectToActionResult("Error", "Home", new { message = ex.Message });
                 context.ExceptionHandled = true;
                 break;

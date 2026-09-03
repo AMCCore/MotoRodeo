@@ -1,5 +1,3 @@
-using System.Security.Claims;
-using System.Text.Json;
 using DMCorp.Framework.Basics.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -7,8 +5,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoRodeo.BL.Commands.Account;
-using MotoRodeo.BL.Exceptions;
 using MotoRodeo.Web.Models;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace MotoRodeo.Web.Controllers;
 
@@ -116,7 +115,7 @@ public class AccountController(IMediator mediator) : Controller
                 Info = "Учётная запись создана. Проверьте электронную почту для активации."
             });
         }
-        catch (DomainException ex)
+        catch (Exception ex)
         {
             form.Error = ex.Message;
             form.Password = string.Empty;
