@@ -32,7 +32,7 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSen
             throw new Exception("Укажите адрес электронной почты.");
         }
 
-        var emailTaken = await unitOfWork.GetSet<DBAccountLogin>()
+        var emailTaken = await unitOfWork.Query<DBAccountLogin>()
             .AnyAsync(x => x.Login == email && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken);
         if (emailTaken)
         {

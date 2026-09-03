@@ -27,7 +27,7 @@ public sealed class RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
             return;
         }
 
-        var accountLogin = await unitOfWork.GetSet<DBAccountLogin>()
+        var accountLogin = await unitOfWork.Query<DBAccountLogin>()
             .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login && x.Login == email)
             .Select(x => new { x.AccountId, x.Login })
             .FirstOrDefaultAsync(cancellationToken);

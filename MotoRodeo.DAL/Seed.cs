@@ -13,8 +13,8 @@ public static class Seed
     /// Предопределённый идентификатор учётной записи администратора.
     /// </summary>
     public static Guid AdminAccountId = Guid.Parse(Environment.GetEnvironmentVariable(nameof(AdminAccountId)) ?? throw new InvalidOperationException("AdminAccountId is not set."));
-    public static string AdminAccountLogin = Environment.GetEnvironmentVariable(nameof(AdminAccountLogin)) ?? throw new InvalidOperationException("AdminAccountLogin is not set.");
-    public static string AdminAccountPass = Environment.GetEnvironmentVariable(nameof(AdminAccountPass)) ?? throw new InvalidOperationException("AdminAccountPass is not set.");
+    private static string AdminAccountLogin = Environment.GetEnvironmentVariable(nameof(AdminAccountLogin)) ?? throw new InvalidOperationException("AdminAccountLogin is not set.");
+    private static string AdminAccountPass = Environment.GetEnvironmentVariable(nameof(AdminAccountPass)) ?? throw new InvalidOperationException("AdminAccountPass is not set.");
 
     /// <summary>
     /// Выполняет инициализацию стартовых данных.
@@ -27,7 +27,7 @@ public static class Seed
     {
         uw.NotChangeLastUpdateTick = true;
 
-        if (!uw.GetSet<DBAccount>().Any(x => x.Id == AdminAccountId))
+        if (!uw.Query<DBAccount>().Any(x => x.Id == AdminAccountId))
         {
             uw.AddEntity(new DBAccount
             {
@@ -40,7 +40,7 @@ public static class Seed
             });
         }
 
-        if (!uw.GetSet<DBAccountLogin>().Any(x => x.AccountId == AdminAccountId && x.AccountLoginType == AccountLoginTypeEnum.Login))
+        if (!uw.Query<DBAccountLogin>().Any(x => x.AccountId == AdminAccountId && x.AccountLoginType == AccountLoginTypeEnum.Login))
         {
             uw.AddEntity(new DBAccountLogin
             {
@@ -51,7 +51,7 @@ public static class Seed
             });
         }
 
-        if (!uw.GetSet<DBAccountRight>().Any(x => x.AccountId == AdminAccountId && x.Right == AccountRightEnum.IsAdmin))
+        if (!uw.Query<DBAccountRight>().Any(x => x.AccountId == AdminAccountId && x.Right == AccountRightEnum.IsAdmin))
         {
             uw.AddEntity(new DBAccountRight
             {

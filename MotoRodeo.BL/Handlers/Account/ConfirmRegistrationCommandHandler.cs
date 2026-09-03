@@ -20,14 +20,7 @@ public sealed class ConfirmRegistrationCommandHandler(IUnitOfWork unitOfWork)
     /// <exception cref="DomainException">Учётная запись не найдена.</exception>
     public async Task Handle(ConfirmRegistrationCommand request, CancellationToken cancellationToken)
     {
-        var account = await unitOfWork.GetSet<DBAccount>()
-            .FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken);
-
-        if (account == null)
-        {
-            throw new Exception("Ссылка подтверждения регистрации недействительна.");
-        }
-
+        var account = await unitOfWork.Query<DBAccount>().FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken) ?? throw new Exception("Ссылка подтверждения регистрации недействительна.");
         if (account.Confirmed)
         {
             return;

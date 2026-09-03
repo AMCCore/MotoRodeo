@@ -24,13 +24,7 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
     /// <exception cref="DomainException">Запрос не найден, просрочен или уже использован.</exception>
     public async Task Handle(ConfirmPasswordResetCommand request, CancellationToken cancellationToken)
     {
-        var resetRequest = await unitOfWork.GetSet<DBPasswordResetRequest>()
-            .FirstOrDefaultAsync(x => x.Id == request.ResetRequestId, cancellationToken);
-
-        if (resetRequest == null)
-        {
-            throw new Exception("Ссылка восстановления пароля недействительна.");
-        }
+        var resetRequest = await unitOfWork.Query<DBPasswordResetRequest>().FirstOrDefaultAsync(x => x.Id == request.ResetRequestId, cancellationToken) ?? throw new Exception("Ссылка восстановления пароля недействительна.");
 
         if (resetRequest.IsUsed)
         {
@@ -42,15 +36,9 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
             throw new Exception("Срок действия ссылки восстановления пароля истёк.");
         }
 
-        var accountLogin = await unitOfWork.GetSet<DBAccountLogin>()
-            .FirstOrDefaultAsync(
-                x => x.AccountId == resetRequest.AccountId && x.AccountLoginType == AccountLoginTypeEnum.Login,
-                cancellationToken);
-
-        if (accountLogin == null)
-        {
-            throw new Exception("Учётная запись для восстановления не найдена.");
-        }
+        var accountLogin = await unitOfWork.Query<DBAccountLogin>()
+            .FirstOrDefaultAsync(x => x.AccountId == resetRequest.AccountId && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken)
+            ?? throw new Exception("Учётная запись для восстановления не найдена.");
 
         var newPassword = PasswordGenerator.Generate();
         accountLogin.Password = BCrypt.Net.BCrypt.HashPassword(newPassword, 11);

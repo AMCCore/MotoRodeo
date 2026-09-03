@@ -160,8 +160,8 @@ public class AccountController(IMediator mediator) : Controller
     /// </summary>
     /// <returns>Перенаправление на страницу входа.</returns>
     [Authorize]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpGet]
+    [Route("/Logout")]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

@@ -22,7 +22,7 @@ public sealed class GetMainAccountLoginQueryHandler(IUnitOfWork unitOfWork)
     /// <returns>Данные для проверки пароля или <c>null</c>.</returns>
     public async Task<AccountLoginDto?> Handle(GetMainAccountLoginQuery request, CancellationToken cancellationToken)
     {
-        var login = await unitOfWork.GetSet<DBAccountLogin>()
+        var login = await unitOfWork.Query<DBAccountLogin>()
             .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login
                         && x.Login == request.Login.Trim().ToLowerInvariant()
                         && x.Account.Confirmed

@@ -23,6 +23,14 @@ Environment.SetEnvironmentVariable("AdminAccountId", configuration.GetValue<stri
 Environment.SetEnvironmentVariable("AdminAccountLogin", configuration.GetValue<string>("AdminAccountLogin"));
 Environment.SetEnvironmentVariable("AdminAccountPass", configuration.GetValue<string>("AdminAccountPass"));
 
+Environment.SetEnvironmentVariable("SmtpHost", configuration.GetValue<string>("SmtpHost"));
+Environment.SetEnvironmentVariable("SmtpPort", configuration.GetValue<string>("SmtpPort"));
+Environment.SetEnvironmentVariable("SmtpUser", configuration.GetValue<string>("SmtpUser"));
+Environment.SetEnvironmentVariable("SmtpPassword", configuration.GetValue<string>("SmtpPassword"));
+Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("SmtpFrom"));
+Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
+Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
+
 #endif
 
 

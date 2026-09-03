@@ -22,7 +22,7 @@ public sealed class GetAccountWithRightsCommandHandler(IUnitOfWork unitOfWork)
     /// <returns>Профиль пользователя.</returns>
     public async Task<AccountWithRightsDto> Handle(GetAccountWithRightsCommand request, CancellationToken cancellationToken)
     {
-        var account = await unitOfWork.GetSet<DBAccount>()
+        var account = await unitOfWork.Query<DBAccount>()
             .Where(x => x.Id == request.AccountId)
             .Select(x => new AccountWithRightsDto
             {
