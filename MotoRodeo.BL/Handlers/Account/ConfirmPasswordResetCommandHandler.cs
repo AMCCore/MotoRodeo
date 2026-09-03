@@ -21,7 +21,6 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
     /// </summary>
     /// <param name="request">Идентификатор запроса восстановления.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <exception cref="DomainException">Запрос не найден, просрочен или уже использован.</exception>
     public async Task Handle(ConfirmPasswordResetCommand request, CancellationToken cancellationToken)
     {
         var resetRequest = await unitOfWork.Query<DBPasswordResetRequest>().FirstOrDefaultAsync(x => x.Id == request.ResetRequestId, cancellationToken) ?? throw new Exception("Ссылка восстановления пароля недействительна.");

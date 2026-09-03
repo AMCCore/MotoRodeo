@@ -48,7 +48,7 @@ public static class MailOptions
     /// <summary>
     /// Текст письма со ссылкой на восстановление пароля. Плейсхолдер: {link}.
     /// </summary>
-    public static string EmailTemplatePasswordReset => Environment.GetEnvironmentVariable(nameof(EmailTemplatePasswordReset)) ?? throw new InvalidOperationException($"{nameof(EmailTemplatePasswordReset)} is not set.");
+    public static string EmailTemplatePasswordReset => Environment.GetEnvironmentVariable(nameof(EmailTemplatePasswordReset)) ?? "Восстановить пароль: {link}";
 
     /// <summary>
     /// Тема письма с новым паролем.
@@ -58,7 +58,7 @@ public static class MailOptions
     /// <summary>
     /// Текст письма с новым паролем. Плейсхолдер: {password}.
     /// </summary>
-    public static string EmailTemplateNewPassword => Environment.GetEnvironmentVariable(nameof(EmailTemplateNewPassword)) ?? throw new InvalidOperationException($"{nameof(EmailTemplateNewPassword)} is not set.");
+    public static string EmailTemplateNewPassword => Environment.GetEnvironmentVariable(nameof(EmailTemplateNewPassword)) ?? "Ваш новый пароль: {password}";
 
     /// <summary>
     /// Тема письма подтверждения регистрации.
@@ -68,5 +68,5 @@ public static class MailOptions
     /// <summary>
     /// Текст письма подтверждения регистрации. Плейсхолдер: {link}.
     /// </summary>
-    public static string EmailTemplateRegistration => Environment.GetEnvironmentVariable(nameof(EmailTemplateRegistration)) ?? throw new InvalidOperationException($"{nameof(EmailTemplateRegistration)} is not set.");
+    public static string EmailTemplateRegistration => Environment.GetEnvironmentVariable(nameof(EmailTemplateRegistration)) ?? "Подтвердить регистрацияю: {link}";
 }

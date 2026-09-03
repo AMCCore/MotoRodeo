@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL;
 using MotoRodeo.DAL;
 using MotoRodeo.DAL.Context;
-using MotoRodeo.Web.Filters;
 using MotoRodeo.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +35,6 @@ Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>(
 
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add<DomainExceptionFilter>();
 });
 builder.Services.AddHttpContextAccessor();
 

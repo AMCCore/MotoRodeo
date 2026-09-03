@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Services;
+using MotoRodeo.DAL;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
 
@@ -11,30 +12,25 @@ namespace MotoRodeo.BL.Handlers.Account;
 /// <summary>
 /// Обработчик регистрации нового пользователя.
 /// </summary>
-public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSender emailSender)
-    : IRequestHandler<RegisterUserCommand>
+public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSender emailSender) : IRequestHandler<RegisterUserCommand>
 {
     /// <summary>
     /// Создаёт неподтверждённую учётную запись и отправляет письмо с ссылкой активации.
     /// </summary>
     /// <param name="request">Данные регистрации.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <exception cref="DomainException">Некорректные данные или email уже занят.</exception>
     public async Task Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request.Email);
+
         var firstName = request.FirstName.Trim();
         var lastName = request.LastName.Trim();
-        var nickname = string.IsNullOrWhiteSpace(request.Nickname) ? null : request.Nickname.Trim();
-        var email = NormalizeEmail(request.Email);
+        var email = request.Email.Trim().ToLowerInvariant();
+        var nickname = request.Nickname?.Trim();
 
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new Exception("Укажите адрес электронной почты.");
-        }
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var emailTaken = await unitOfWork.Query<DBAccountLogin>()
-            .AnyAsync(x => x.Login == email && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken);
-        if (emailTaken)
+        if (await unitOfWork.Query<DBAccountLogin>().AnyAsync(x => x.Login == email && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken))
         {
             throw new Exception("Пользователь с такой электронной почтой уже существует.");
         }
@@ -60,12 +56,13 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSen
             AccountId = account.Id,
             Right = AccountRightEnum.CanParticipate
         });
-        await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
-        var link = request.ConfirmationLinkFactory(account.Id);
-        var body = MailOptions.EmailTemplateRegistration.Replace("{link}", link, StringComparison.Ordinal);
-        await emailSender.SendAsync(email, MailOptions.EmailSubjectRegistration, body, cancellationToken);
+        await unitOfWork.CommitAsync(cancellationToken);
+
+        await emailSender.SendAsync(
+            email,
+            MailOptions.EmailSubjectRegistration,
+            MailOptions.EmailTemplateRegistration.Replace("{link}", request.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
+            cancellationToken);
     }
-
-    private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
 }
