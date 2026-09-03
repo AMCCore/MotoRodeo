@@ -1,0 +1,41 @@
+@model RegisterForm
+@{
+    ViewData["Title"] = "Регистрация";
+}
+<h1 class="h4 mb-3">Регистрация</h1>
+@if (!string.IsNullOrEmpty(Model.Info))
+{
+    <div class="alert alert-success">@Model.Info</div>
+    <a class="btn btn-primary w-100 py-3" asp-action="Login">Перейти ко входу</a>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    <form method="post" asp-action="Register">
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Nickname" class="form-label"></label>
+            <input asp-for="Nickname" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" autocomplete="email" type="email" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Регистрация</button>
+        <a class="btn btn-outline-secondary w-100 py-3" asp-action="Login">Вход</a>
+    </form>
+}

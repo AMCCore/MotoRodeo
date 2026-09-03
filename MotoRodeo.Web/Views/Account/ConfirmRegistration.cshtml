@@ -1,0 +1,15 @@
+@model ConfirmRegistrationModel
+@{
+    ViewData["Title"] = "Подтверждение регистрации";
+}
+<h1 class="h4 mb-3">Подтверждение регистрации</h1>
+@if (Model.Success)
+{
+    <div class="alert alert-success">@Model.Message</div>
+    <a class="btn btn-primary w-100 py-3" asp-action="Login">Перейти ко входу</a>
+}
+else
+{
+    <div class="alert alert-danger">@Model.Message</div>
+    <a class="btn btn-primary w-100 py-3" asp-action="ForgotPassword">Восстановить пароль</a>
+}
