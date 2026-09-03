@@ -9,3 +9,9 @@ body {
 .form-check {
     padding: 0.5rem 0 0.5rem 1.75rem;
 }
+
+.remember-me-checkbox {
+    width: 16px;
+    height: 16px;
+    min-height: 16px;
+}
