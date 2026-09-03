@@ -9,7 +9,9 @@ namespace MotoRodeo.Web.Services;
 /// <summary>
 /// Реализация проверки прав текущего пользователя на основе claims cookie-аутентификации.
 /// </summary>
-public sealed class SecurityService(IHttpContextAccessor contextAccessor) : IAdvancedSecurityService
+public sealed class SecurityService(
+    IHttpContextAccessor contextAccessor,
+    ILogger<SecurityService> logger) : IAdvancedSecurityService
 {
     /// <inheritdoc />
     public bool IsAdmin => Rights.Any(y => y == AccountRightEnum.IsAdmin.GetEnumGuid());
@@ -29,8 +31,9 @@ public sealed class SecurityService(IHttpContextAccessor contextAccessor) : IAdv
             {
                 return JsonSerializer.Deserialize<IList<Guid>>(claim.Value) ?? [];
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogDebug(ex, "Не удалось десериализовать claim прав пользователя.");
                 return [];
             }
         }

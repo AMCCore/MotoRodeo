@@ -1,6 +1,7 @@
 using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Services;
 using MotoRodeo.DAL.Entities;
@@ -11,7 +12,10 @@ namespace MotoRodeo.BL.Handlers.Account;
 /// <summary>
 /// Обработчик подтверждения восстановления пароля.
 /// </summary>
-public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, IEmailSender emailSender)
+public sealed class ConfirmPasswordResetCommandHandler(
+    IUnitOfWork unitOfWork,
+    IEmailSender emailSender,
+    ILogger<ConfirmPasswordResetCommandHandler> logger)
     : IRequestHandler<ConfirmPasswordResetCommand>
 {
     private static readonly TimeSpan ResetLinkLifetime = TimeSpan.FromHours(24);
@@ -23,6 +27,8 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
     /// <param name="cancellationToken">Токен отмены.</param>
     public async Task Handle(ConfirmPasswordResetCommand request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Начало подтверждения восстановления пароля. ResetRequestId={ResetRequestId}", request.ResetRequestId);
+
         var resetRequest = await unitOfWork.Query<DBPasswordResetRequest>().FirstOrDefaultAsync(x => x.Id == request.ResetRequestId, cancellationToken) ?? throw new Exception("Ссылка восстановления пароля недействительна.");
 
         if (resetRequest.IsUsed)
@@ -46,5 +52,10 @@ public sealed class ConfirmPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
 
         var body = MailOptions.EmailTemplateNewPassword.Replace("{password}", newPassword, StringComparison.Ordinal);
         await emailSender.SendAsync(accountLogin.Login, MailOptions.EmailSubjectNewPassword, body, cancellationToken);
+
+        logger.LogInformation(
+            "Пароль сброшен. AccountId={AccountId}, ResetRequestId={ResetRequestId}",
+            resetRequest.AccountId,
+            resetRequest.Id);
     }
 }

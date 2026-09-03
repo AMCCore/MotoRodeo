@@ -1,6 +1,7 @@
 using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Dtos;
 using MotoRodeo.DAL.Entities;
@@ -11,7 +12,9 @@ namespace MotoRodeo.BL.Handlers.Account;
 /// <summary>
 /// Обработчик запроса профиля с правами.
 /// </summary>
-public sealed class GetAccountWithRightsCommandHandler(IUnitOfWork unitOfWork)
+public sealed class GetAccountWithRightsCommandHandler(
+    IUnitOfWork unitOfWork,
+    ILogger<GetAccountWithRightsCommandHandler> logger)
     : IRequestHandler<GetAccountWithRightsCommand, AccountWithRightsDto>
 {
     /// <summary>
@@ -22,6 +25,8 @@ public sealed class GetAccountWithRightsCommandHandler(IUnitOfWork unitOfWork)
     /// <returns>Профиль пользователя.</returns>
     public async Task<AccountWithRightsDto> Handle(GetAccountWithRightsCommand request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Начало загрузки профиля с правами. AccountId={AccountId}", request.AccountId);
+
         var account = await unitOfWork.Query<DBAccount>()
             .Where(x => x.Id == request.AccountId)
             .Select(x => new AccountWithRightsDto

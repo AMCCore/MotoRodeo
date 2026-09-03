@@ -1,6 +1,7 @@
 using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Services;
 using MotoRodeo.DAL;
@@ -12,7 +13,10 @@ namespace MotoRodeo.BL.Handlers.Account;
 /// <summary>
 /// Обработчик регистрации нового пользователя.
 /// </summary>
-public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSender emailSender) : IRequestHandler<RegisterUserCommand>
+public sealed class RegisterUserCommandHandler(
+    IUnitOfWork unitOfWork,
+    IEmailSender emailSender,
+    ILogger<RegisterUserCommandHandler> logger) : IRequestHandler<RegisterUserCommand>
 {
     /// <summary>
     /// Создаёт неподтверждённую учётную запись и отправляет письмо с ссылкой активации.
@@ -27,6 +31,8 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSen
         var lastName = request.LastName.Trim();
         var email = request.Email.Trim().ToLowerInvariant();
         var nickname = request.Nickname?.Trim();
+
+        logger.LogInformation("Начало регистрации пользователя. Email={Email}", email);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -64,5 +70,7 @@ public sealed class RegisterUserCommandHandler(IUnitOfWork unitOfWork, IEmailSen
             MailOptions.EmailSubjectRegistration,
             MailOptions.EmailTemplateRegistration.Replace("{link}", request.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
             cancellationToken);
+
+        logger.LogInformation("Пользователь зарегистрирован. AccountId={AccountId}, Email={Email}", account.Id, email);
     }
 }

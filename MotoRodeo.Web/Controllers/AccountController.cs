@@ -15,7 +15,7 @@ namespace MotoRodeo.Web.Controllers;
 /// <summary>
 /// Регистрация, вход, выход и запрос восстановления пароля.
 /// </summary>
-public class AccountController(IMediator mediator) : Controller
+public class AccountController(IMediator mediator, ILogger<AccountController> logger) : Controller
 {
     /// <summary>
     /// Отображает форму входа или перенаправляет уже аутентифицированного пользователя.
@@ -49,15 +49,21 @@ public class AccountController(IMediator mediator) : Controller
             return View(form);
         }
 
-        var login = await mediator.Send(new GetMainAccountLoginQuery(form.Login.Trim()), token);
+        var normalizedLogin = form.Login.Trim();
+        logger.LogInformation("Начало входа. Login={Login}", normalizedLogin);
+
+        var login = await mediator.Send(new GetMainAccountLoginQuery(normalizedLogin), token);
         if (login == null || !BCrypt.Net.BCrypt.Verify(form.Password, login.Password))
         {
+            logger.LogWarning("Неудачная попытка входа. Login={Login}", normalizedLogin);
             form.Password = string.Empty;
             form.Error = "Неверный логин или пароль.";
             return View(form);
         }
 
         await SignInAsync(login.AccountId, form.RememberMe, token);
+        logger.LogInformation("Пользователь вошёл в систему. AccountId={AccountId}", login.AccountId);
+
         if (!string.IsNullOrWhiteSpace(form.ReturnUrl) && Url.IsLocalUrl(form.ReturnUrl))
         {
             return Redirect(form.ReturnUrl);
@@ -97,6 +103,8 @@ public class AccountController(IMediator mediator) : Controller
             return View(form);
         }
 
+        logger.LogInformation("Начало регистрации. Email={Email}", form.Email);
+
         try
         {
             await mediator.Send(new RegisterUserCommand(
@@ -118,6 +126,7 @@ public class AccountController(IMediator mediator) : Controller
         }
         catch (Exception ex)
         {
+            logger.LogWarning(ex, "Ошибка регистрации. Email={Email}", form.Email);
             form.Error = ex.Message;
             form.Password = string.Empty;
             return View(form);
@@ -135,6 +144,8 @@ public class AccountController(IMediator mediator) : Controller
     [Route("Confirm/{AccountId}")]
     public async Task<IActionResult> ConfirmRegistration([Required] Guid AccountId, CancellationToken token = default)
     {
+        logger.LogInformation("Начало подтверждения регистрации. AccountId={AccountId}", AccountId);
+
         try
         {
             await mediator.Send(new ConfirmRegistrationCommand(AccountId), token);
@@ -144,8 +155,9 @@ public class AccountController(IMediator mediator) : Controller
                 Message = "Учётная запись подтверждена."
             });
         }
-        catch
+        catch (Exception ex)
         {
+            logger.LogWarning(ex, "Ошибка подтверждения регистрации. AccountId={AccountId}", AccountId);
             return View(new ConfirmRegistrationModel
             {
                 Success = false,
@@ -196,7 +208,9 @@ public class AccountController(IMediator mediator) : Controller
     [Route("/Logout")]
     public async Task<IActionResult> Logout()
     {
+        var accountId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        logger.LogInformation("Пользователь вышел из системы. AccountId={AccountId}", accountId);
         return RedirectToAction(nameof(Login));
     }
 
@@ -221,6 +235,4 @@ public class AccountController(IMediator mediator) : Controller
                 ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
             });
     }
-
-
 }

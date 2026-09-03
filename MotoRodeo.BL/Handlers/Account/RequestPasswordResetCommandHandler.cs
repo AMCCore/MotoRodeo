@@ -1,6 +1,7 @@
 using DMCorp.Framework.Basics.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MotoRodeo.BL.Commands.Account;
 using MotoRodeo.BL.Services;
 using MotoRodeo.DAL.Entities;
@@ -11,7 +12,10 @@ namespace MotoRodeo.BL.Handlers.Account;
 /// <summary>
 /// Обработчик запроса на восстановление пароля.
 /// </summary>
-public sealed class RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, IEmailSender emailSender)
+public sealed class RequestPasswordResetCommandHandler(
+    IUnitOfWork unitOfWork,
+    IEmailSender emailSender,
+    ILogger<RequestPasswordResetCommandHandler> logger)
     : IRequestHandler<RequestPasswordResetCommand>
 {
     /// <summary>
@@ -22,8 +26,11 @@ public sealed class RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
     public async Task Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
     {
         var email = request.Email.Trim().ToLowerInvariant();
+        logger.LogInformation("Начало запроса восстановления пароля. Email={Email}", email);
+
         if (string.IsNullOrWhiteSpace(email))
         {
+            logger.LogDebug("Запрос восстановления пароля пропущен: пустой email.");
             return;
         }
 
@@ -34,6 +41,7 @@ public sealed class RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
 
         if (accountLogin == null)
         {
+            logger.LogDebug("Запрос восстановления пароля: учётная запись не найдена. Email={Email}", email);
             return;
         }
 
@@ -48,5 +56,10 @@ public sealed class RequestPasswordResetCommandHandler(IUnitOfWork unitOfWork, I
         var link = request.ResetLinkFactory(resetRequest.Id);
         var body = MailOptions.EmailTemplatePasswordReset.Replace("{link}", link, StringComparison.Ordinal);
         await emailSender.SendAsync(accountLogin.Login, MailOptions.EmailSubjectPasswordReset, body, cancellationToken);
+
+        logger.LogInformation(
+            "Письмо восстановления пароля отправлено. AccountId={AccountId}, ResetRequestId={ResetRequestId}",
+            accountLogin.AccountId,
+            resetRequest.Id);
     }
 }
