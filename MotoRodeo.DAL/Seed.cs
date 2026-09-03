@@ -12,9 +12,9 @@ public static class Seed
     /// <summary>
     /// Предопределённый идентификатор учётной записи администратора.
     /// </summary>
-    public static readonly Guid AdminAccountId = Guid.Parse(Environment.GetEnvironmentVariable(nameof(AdminAccountId)) ?? throw new InvalidOperationException("AdminAccountId is not set."));
-    public static readonly string AdminAccountLogin = Environment.GetEnvironmentVariable(nameof(AdminAccountLogin)) ?? throw new InvalidOperationException("AdminAccountLogin is not set.");
-    public static readonly string AdminAccountPass = Environment.GetEnvironmentVariable(nameof(AdminAccountPass)) ?? throw new InvalidOperationException("AdminAccountPass is not set.");
+    public static Guid AdminAccountId = Guid.Parse(Environment.GetEnvironmentVariable(nameof(AdminAccountId)) ?? throw new InvalidOperationException("AdminAccountId is not set."));
+    public static string AdminAccountLogin = Environment.GetEnvironmentVariable(nameof(AdminAccountLogin)) ?? throw new InvalidOperationException("AdminAccountLogin is not set.");
+    public static string AdminAccountPass = Environment.GetEnvironmentVariable(nameof(AdminAccountPass)) ?? throw new InvalidOperationException("AdminAccountPass is not set.");
 
     /// <summary>
     /// Выполняет инициализацию стартовых данных.

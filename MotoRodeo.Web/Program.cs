@@ -18,22 +18,10 @@ Environment.SetEnvironmentVariable("DbConnection", configuration.GetValue<string
 Environment.SetEnvironmentVariable("SecKey", configuration.GetValue<string>("SecKey"));
 Environment.SetEnvironmentVariable("LuckypennyLicenseKey", configuration.GetValue<string>("LuckypennyLicenseKey"));
 Environment.SetEnvironmentVariable("DefaultRegistrationClosesDaysBefore", configuration.GetValue<string>("DefaultRegistrationClosesDaysBefore"));
-Environment.SetEnvironmentVariable("AdminLogin", configuration.GetValue<string>("AdminLogin"));
-Environment.SetEnvironmentVariable("AdminPassword", configuration.GetValue<string>("AdminPassword"));
-Environment.SetEnvironmentVariable("AdminName", configuration.GetValue<string>("AdminName"));
-Environment.SetEnvironmentVariable("SmtpHost", configuration.GetValue<string>("SmtpHost"));
-Environment.SetEnvironmentVariable("SmtpPort", configuration.GetValue<string>("SmtpPort"));
-Environment.SetEnvironmentVariable("SmtpUser", configuration.GetValue<string>("SmtpUser"));
-Environment.SetEnvironmentVariable("SmtpPassword", configuration.GetValue<string>("SmtpPassword"));
-Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("SmtpFrom"));
-Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
-Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
-Environment.SetEnvironmentVariable("EmailTemplatePasswordReset", configuration.GetValue<string>("EmailTemplatePasswordReset"));
-Environment.SetEnvironmentVariable("EmailTemplateNewPassword", configuration.GetValue<string>("EmailTemplateNewPassword"));
-Environment.SetEnvironmentVariable("EmailTemplateRegistration", configuration.GetValue<string>("EmailTemplateRegistration"));
-Environment.SetEnvironmentVariable("EmailSubjectPasswordReset", configuration.GetValue<string>("EmailSubjectPasswordReset"));
-Environment.SetEnvironmentVariable("EmailSubjectNewPassword", configuration.GetValue<string>("EmailSubjectNewPassword"));
-Environment.SetEnvironmentVariable("EmailSubjectRegistration", configuration.GetValue<string>("EmailSubjectRegistration"));
+
+Environment.SetEnvironmentVariable("AdminAccountId", configuration.GetValue<string>("AdminAccountId"));
+Environment.SetEnvironmentVariable("AdminAccountLogin", configuration.GetValue<string>("AdminAccountLogin"));
+Environment.SetEnvironmentVariable("AdminAccountPass", configuration.GetValue<string>("AdminAccountPass"));
 
 #endif
 
