@@ -31,6 +31,7 @@ public sealed class GetMainAccountLoginQueryHandler(
             .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login
                         && x.Login == normalizedLogin
                         && x.Account.Confirmed
+                        && !x.Account.IsBlocked
                         && x.Password != null)
             .Select(x => new AccountLoginDto { AccountId = x.AccountId, Password = x.Password! })
             .FirstOrDefaultAsync(cancellationToken);

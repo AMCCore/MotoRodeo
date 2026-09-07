@@ -31,6 +31,13 @@ public sealed class RegisterForm
     public string? Nickname { get; set; }
 
     /// <summary>
+    /// Транспортное средство.
+    /// </summary>
+    [Display(Name = "Транспортное средство")]
+    [MaxLength(255)]
+    public string? Vehicle { get; set; }
+
+    /// <summary>
     /// Электронная почта (логин).
     /// </summary>
     [Required]

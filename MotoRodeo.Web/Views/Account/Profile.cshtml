@@ -1,0 +1,43 @@
+@model ProfileForm
+@{
+    ViewData["Title"] = "Профиль";
+}
+<h1 class="h4 mb-3">Профиль</h1>
+
+@if (!string.IsNullOrEmpty(Model.Info))
+{
+    <div class="alert alert-success">@Model.Info</div>
+}
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form method="post" asp-action="Profile">
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Nickname" class="form-label"></label>
+        <input asp-for="Nickname" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" readonly />
+        <div class="form-text">Смена email выполняется через СТП системы.</div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Vehicle" class="form-label"></label>
+        <input asp-for="Vehicle" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Сохранить</button>
+</form>
+
+<a class="btn btn-outline-secondary w-100 py-3" asp-action="ChangePassword">Сменить пароль</a>

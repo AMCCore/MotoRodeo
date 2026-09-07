@@ -1,0 +1,92 @@
+@model IReadOnlyList<AccountListItemDto>
+@{
+    ViewData["Title"] = "Пользователи";
+}
+<h1 class="h4 mb-3">Пользователи</h1>
+
+<div class="mb-3">
+    <label for="user-search" class="form-label">Поиск</label>
+    <input id="user-search" type="search" class="form-control" placeholder="Имя, фамилия, прозвище или email" autocomplete="off" />
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-secondary">Пользователей пока нет.</div>
+}
+else
+{
+    <div id="users-list" class="list-group mb-3">
+        @foreach (var user in Model)
+        {
+            <a asp-action="Details"
+               asp-route-id="@user.Id"
+               class="list-group-item list-group-item-action user-row py-3"
+               data-firstname="@user.FirstName"
+               data-lastname="@user.LastName"
+               data-nickname="@(user.Nickname ?? "")"
+               data-email="@user.Email">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <div>
+                        <div class="fw-semibold">@user.LastName @user.FirstName</div>
+                        @if (!string.IsNullOrWhiteSpace(user.Nickname))
+                        {
+                            <div class="small text-muted">@user.Nickname</div>
+                        }
+                        <div class="small">@user.Email</div>
+                    </div>
+                    <div class="text-end">
+                        @if (user.IsBlocked)
+                        {
+                            <span class="badge text-bg-danger">Заблокирован</span>
+                        }
+                        else if (!user.Confirmed)
+                        {
+                            <span class="badge text-bg-warning">Не подтверждён</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-success">Активен</span>
+                        }
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+    <div id="users-empty" class="alert alert-secondary d-none">Никого не найдено.</div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('user-search');
+            const rows = Array.from(document.querySelectorAll('.user-row'));
+            const empty = document.getElementById('users-empty');
+            if (!input) return;
+
+            function normalize(value) {
+                return (value || '').toLowerCase().trim();
+            }
+
+            function filterUsers() {
+                const q = normalize(input.value);
+                let visible = 0;
+                for (const row of rows) {
+                    const haystack = [
+                        row.dataset.firstname,
+                        row.dataset.lastname,
+                        row.dataset.nickname,
+                        row.dataset.email
+                    ].map(normalize).join(' ');
+                    const show = !q || haystack.includes(q);
+                    row.classList.toggle('d-none', !show);
+                    if (show) visible++;
+                }
+                if (empty) {
+                    empty.classList.toggle('d-none', visible > 0 || rows.length === 0);
+                }
+            }
+
+            input.addEventListener('input', filterUsers);
+        })();
+    </script>
+}

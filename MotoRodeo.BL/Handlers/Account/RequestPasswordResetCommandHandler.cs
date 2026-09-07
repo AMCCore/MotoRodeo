@@ -35,13 +35,15 @@ public sealed class RequestPasswordResetCommandHandler(
         }
 
         var accountLogin = await unitOfWork.Query<DBAccountLogin>()
-            .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login && x.Login == email)
+            .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login
+                        && x.Login == email
+                        && !x.Account.IsBlocked)
             .Select(x => new { x.AccountId, x.Login })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (accountLogin == null)
         {
-            logger.LogDebug("Запрос восстановления пароля: учётная запись не найдена. Email={Email}", email);
+            logger.LogDebug("Запрос восстановления пароля: учётная запись не найдена или заблокирована. Email={Email}", email);
             return;
         }
 

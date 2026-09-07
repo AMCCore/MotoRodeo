@@ -27,12 +27,10 @@
                     {
                         <p class="text-white-50">@User.Identity?.Name</p>
                         <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Events" asp-action="Index">События</a>
+                        <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Account" asp-action="Profile">Профиль</a>
                         @if (Security.HasRight(AccountRightEnum.ManageEvents))
                         {
                             <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Events" asp-action="Create">Новое событие</a>
-                        }
-                        @if (Security.IsAdmin)
-                        {
                             <a class="btn btn-outline-light w-100 mb-2 py-3" asp-controller="Accounts" asp-action="Index">Пользователи</a>
                         }
 

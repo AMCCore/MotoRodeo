@@ -31,6 +31,7 @@ public sealed class RegisterUserCommandHandler(
         var lastName = request.LastName.Trim();
         var email = request.Email.Trim().ToLowerInvariant();
         var nickname = request.Nickname?.Trim();
+        var vehicle = string.IsNullOrWhiteSpace(request.Vehicle) ? null : request.Vehicle.Trim();
 
         logger.LogInformation("Начало регистрации пользователя. Email={Email}", email);
 
@@ -46,6 +47,7 @@ public sealed class RegisterUserCommandHandler(
             FirstName = firstName,
             LastName = lastName,
             Login = nickname,
+            Vehicle = vehicle,
             Confirmed = false,
             DateCreated = DateTimeOffset.UtcNow
         };

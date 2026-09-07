@@ -48,6 +48,9 @@ namespace MotoRodeo.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Identifier"));
 
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -62,6 +65,10 @@ namespace MotoRodeo.DAL.Migrations
                     b.Property<string>("Login")
                         .HasMaxLength(127)
                         .HasColumnType("character varying(127)");
+
+                    b.Property<string>("Vehicle")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
 
