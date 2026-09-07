@@ -1,6 +1,8 @@
+using System.Globalization;
 using DMCorp.Framework.Basics.DAL;
 using DMCorp.Framework.Basics.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL;
 using MotoRodeo.DAL;
@@ -8,6 +10,16 @@ using MotoRodeo.DAL.Context;
 using MotoRodeo.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var ruCulture = new CultureInfo("ru-RU");
+CultureInfo.DefaultThreadCurrentCulture = ruCulture;
+CultureInfo.DefaultThreadCurrentUICulture = ruCulture;
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(ruCulture);
+    options.SupportedCultures = [ruCulture];
+    options.SupportedUICultures = [ruCulture];
+});
 
 var configuration = builder.Configuration;
 
@@ -74,6 +86,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

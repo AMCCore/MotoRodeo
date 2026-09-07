@@ -56,7 +56,7 @@ public class DBEventParticipant : IEntityBase, IEntityWithDateCreated
     /// <summary>
     /// Статус заявки на участие.
     /// </summary>
-    public ParticipantStatusEnum Status { get; set; } = ParticipantStatusEnum.Candidate;
+    public ParticipantStatusEnum Status { get; set; } = ParticipantStatusEnum.Draft;
 
     /// <summary>
     /// true — своя техника; false — арендная техника организатора.

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MotoRodeo.DAL.Migrations
 {
     [DbContext(typeof(MotoRodeoContext))]
-    [Migration("20260903130632_InitMigration")]
-    partial class InitMigration
+    [Migration("20260907192615_Init_Migration")]
+    partial class Init_Migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,11 +229,20 @@ namespace MotoRodeo.DAL.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
 
                     b.Property<long>("LastUpdateTick")
                         .HasColumnType("bigint");
+
+                    b.Property<Guid>("Status")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("UsesOwnEquipment")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

@@ -38,7 +38,7 @@ public sealed class RejectParticipantCommandHandler(
                 cancellationToken)
             ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
 
-        if (participant.Status != ParticipantStatusEnum.Candidate)
+        if (participant.Status != ParticipantStatusEnum.Draft)
         {
             throw new InvalidOperationException("Отклонить можно только кандидата.");
         }

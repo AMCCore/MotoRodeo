@@ -4,7 +4,7 @@
     var canManage = ViewBag.CanManage as bool? == true;
     string StatusLabel(ParticipantStatusEnum s) => s switch
     {
-        ParticipantStatusEnum.Candidate => "Кандидат",
+        ParticipantStatusEnum.Draft => "Новая",
         ParticipantStatusEnum.Confirmed => "Подтверждён",
         ParticipantStatusEnum.Rejected => "Отклонён",
         _ => s.ToString()
@@ -90,7 +90,7 @@ else if (!Model.RegistrationOpen)
                         @StatusLabel(p.Status) · @(p.UsesOwnEquipment ? "своя техника" : "аренда") ·
                         @p.DateCreated.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
                     </div>
-                    @if (p.Status == ParticipantStatusEnum.Candidate)
+                    @if (p.Status == ParticipantStatusEnum.Draft)
                     {
                         <div class="d-flex gap-2">
                             <form method="post" asp-action="Confirm" class="flex-fill">

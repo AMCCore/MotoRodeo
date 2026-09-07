@@ -23,12 +23,12 @@
     </div>
     <div class="mb-3">
         <label asp-for="EventDateLocal" class="form-label"></label>
-        <input asp-for="EventDateLocal" class="form-control" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+        <input asp-for="EventDateLocal" class="form-control" type="text" placeholder="дд.мм.гггг чч:мм" asp-format="{0:dd.MM.yyyy HH:mm}" autocomplete="off" />
         <span asp-validation-for="EventDateLocal" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="RegistrationClosesAtLocal" class="form-label"></label>
-        <input asp-for="RegistrationClosesAtLocal" class="form-control" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}" />
+        <input asp-for="RegistrationClosesAtLocal" class="form-control" type="text" placeholder="дд.мм.гггг" asp-format="{0:dd.MM.yyyy}" autocomplete="off" />
         <span asp-validation-for="RegistrationClosesAtLocal" class="text-danger"></span>
     </div>
     <div class="mb-3">
@@ -63,3 +63,24 @@
     <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Сохранить</button>
     <a class="btn btn-outline-secondary w-100 py-3" asp-action="Index">Отмена</a>
 </form>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <script>
+        flatpickr('#EventDateLocal', {
+            enableTime: true,
+            time_24hr: true,
+            dateFormat: 'd.m.Y H:i',
+            locale: 'ru',
+            allowInput: true
+        });
+        flatpickr('#RegistrationClosesAtLocal', {
+            enableTime: false,
+            dateFormat: 'd.m.Y',
+            locale: 'ru',
+            allowInput: true
+        });
+    </script>
+}

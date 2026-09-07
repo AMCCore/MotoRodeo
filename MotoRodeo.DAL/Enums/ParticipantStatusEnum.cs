@@ -11,9 +11,9 @@ public enum ParticipantStatusEnum
     /// <summary>
     /// Заявка подана, участие ещё не подтверждено.
     /// </summary>
-    [Description("Кандидат")]
+    [Description("Новая заявка")]
     [EnumGuid("A1B2C3D4-5E6F-4789-A012-3456789ABCDE")]
-    Candidate,
+    Draft,
 
     /// <summary>
     /// Участие подтверждено администратором или внешним API.

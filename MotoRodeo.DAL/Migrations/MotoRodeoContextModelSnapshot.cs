@@ -226,11 +226,20 @@ namespace MotoRodeo.DAL.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
 
                     b.Property<long>("LastUpdateTick")
                         .HasColumnType("bigint");
+
+                    b.Property<Guid>("Status")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("UsesOwnEquipment")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

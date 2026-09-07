@@ -61,7 +61,7 @@ public sealed class ApplyToEventCommandHandler(
         {
             EventId = entity.Id,
             AccountId = accountId,
-            Status = ParticipantStatusEnum.Candidate,
+            Status = ParticipantStatusEnum.Draft,
             UsesOwnEquipment = request.UsesOwnEquipment,
             DateCreated = DateTimeOffset.UtcNow
         });

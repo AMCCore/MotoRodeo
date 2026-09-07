@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MotoRodeo.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class Init_Migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -168,8 +168,11 @@ namespace MotoRodeo.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     LastUpdateTick = table.Column<long>(type: "bigint", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     EventId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uuid", nullable: false)
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<Guid>(type: "uuid", nullable: false),
+                    UsesOwnEquipment = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

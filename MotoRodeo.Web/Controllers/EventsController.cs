@@ -14,6 +14,7 @@ namespace MotoRodeo.Web.Controllers;
 /// Список, карточка, создание и редактирование событий, заявки и подтверждение участия.
 /// </summary>
 [Authorize]
+[Route("[controller]")]
 public class EventsController(
     IMediator mediator,
     IAdvancedSecurityService security) : Controller
@@ -22,6 +23,7 @@ public class EventsController(
     /// Список событий: текущее, планируемые, прошедшие.
     /// </summary>
     [HttpGet]
+    [Route("")]
     public async Task<IActionResult> Index(CancellationToken token)
     {
         var list = await mediator.Send(new GetEventsListQuery(), token);
@@ -32,6 +34,7 @@ public class EventsController(
     /// Карточка события.
     /// </summary>
     [HttpGet]
+    [Route("/Event/{id}")]
     public async Task<IActionResult> Details(Guid id, CancellationToken token)
     {
         try
@@ -55,6 +58,7 @@ public class EventsController(
     /// Форма создания события.
     /// </summary>
     [HttpGet]
+    [Route("/Create")]
     public async Task<IActionResult> Create(CancellationToken token)
     {
         if (!security.HasRight(AccountRightEnum.ManageEvents))
@@ -69,9 +73,11 @@ public class EventsController(
 
         return View("Edit", new EventEditForm
         {
+            Title = "МотоРодео",
+            Place = "Мотошкола Дзен",
             EventDateLocal = ToLocalInput(eventDate),
             RegistrationClosesAtLocal = ToLocalInput(closes),
-            GroupCount = 1,
+            GroupCount = 4,
             JudgeCandidates = candidates
         });
     }
@@ -80,6 +86,7 @@ public class EventsController(
     /// Форма редактирования события.
     /// </summary>
     [HttpGet]
+    [Route("Edit/{id}")]
     public async Task<IActionResult> Edit(Guid id, CancellationToken token)
     {
         if (!security.HasRight(AccountRightEnum.ManageEvents))
@@ -126,6 +133,7 @@ public class EventsController(
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Route("Edit")]
     public async Task<IActionResult> Edit(EventEditForm form, CancellationToken token)
     {
         if (!security.HasRight(AccountRightEnum.ManageEvents))
@@ -144,7 +152,7 @@ public class EventsController(
         try
         {
             var eventDate = ToUtcOffset(form.EventDateLocal);
-            var closesAt = ToUtcOffset(form.RegistrationClosesAtLocal);
+            var closesAt = ToUtcOffsetEndOfDay(form.RegistrationClosesAtLocal);
 
             if (form.Id is null)
             {
@@ -185,6 +193,7 @@ public class EventsController(
     /// Подача заявки на участие.
     /// </summary>
     [HttpPost]
+    [Route("Apply")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Apply(ApplyToEventForm form, CancellationToken token)
     {
@@ -209,6 +218,7 @@ public class EventsController(
     /// Подтверждение участия кандидата.
     /// </summary>
     [HttpPost]
+    [Route("Confirm")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(Guid eventId, Guid accountId, CancellationToken token)
     {
@@ -233,6 +243,7 @@ public class EventsController(
     /// Отклонение заявки кандидата.
     /// </summary>
     [HttpPost]
+    [Route("Reject")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reject(Guid eventId, Guid accountId, CancellationToken token)
     {
@@ -286,4 +297,10 @@ public class EventsController(
 
     private static DateTimeOffset ToUtcOffset(DateTime localUnspecified) =>
         new DateTimeOffset(DateTime.SpecifyKind(localUnspecified, DateTimeKind.Local)).ToUniversalTime();
+
+    /// <summary>
+    /// Закрытие регистрации — выбранный день включительно (до конца суток).
+    /// </summary>
+    private static DateTimeOffset ToUtcOffsetEndOfDay(DateTime localDate) =>
+        ToUtcOffset(localDate.Date.AddDays(1).AddTicks(-1));
 }
