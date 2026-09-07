@@ -1,6 +1,8 @@
+using System.Globalization;
 using DMCorp.Framework.Basics.DAL;
 using DMCorp.Framework.Basics.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL;
 using MotoRodeo.DAL;
@@ -9,6 +11,16 @@ using MotoRodeo.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var ruCulture = new CultureInfo("ru-RU");
+CultureInfo.DefaultThreadCurrentCulture = ruCulture;
+CultureInfo.DefaultThreadCurrentUICulture = ruCulture;
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(ruCulture);
+    options.SupportedCultures = [ruCulture];
+    options.SupportedUICultures = [ruCulture];
+});
+
 var configuration = builder.Configuration;
 
 #if DEBUG
@@ -16,7 +28,7 @@ var configuration = builder.Configuration;
 Environment.SetEnvironmentVariable("DbConnection", configuration.GetValue<string>("DbConnection"));
 Environment.SetEnvironmentVariable("SecKey", configuration.GetValue<string>("SecKey"));
 Environment.SetEnvironmentVariable("LuckypennyLicenseKey", configuration.GetValue<string>("LuckypennyLicenseKey"));
-Environment.SetEnvironmentVariable("DefaultRegistrationClosesDaysBefore", configuration.GetValue<string>("DefaultRegistrationClosesDaysBefore"));
+Environment.SetEnvironmentVariable("RegistrationClosesDaysBefore", configuration.GetValue<string>("RegistrationClosesDaysBefore"));
 
 Environment.SetEnvironmentVariable("AdminAccountId", configuration.GetValue<string>("AdminAccountId"));
 Environment.SetEnvironmentVariable("AdminAccountLogin", configuration.GetValue<string>("AdminAccountLogin"));
@@ -29,6 +41,8 @@ Environment.SetEnvironmentVariable("SmtpPassword", configuration.GetValue<string
 Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("SmtpFrom"));
 Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
 Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
+
+Environment.SetEnvironmentVariable("EventParticipationApiKey", configuration.GetValue<string>("EventParticipationApiKey"));
 
 #endif
 
@@ -72,10 +86,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
+app.MapControllers();
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

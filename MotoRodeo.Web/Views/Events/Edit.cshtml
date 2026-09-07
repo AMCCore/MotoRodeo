@@ -1,0 +1,86 @@
+@model EventEditForm
+@{
+    var isNew = Model.Id is null;
+    ViewData["Title"] = isNew ? "Новое событие" : "Редактирование события";
+}
+<h1 class="h4 mb-3">@ViewData["Title"]</h1>
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+<form method="post" asp-action="Edit">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Place" class="form-label"></label>
+        <input asp-for="Place" class="form-control" />
+        <span asp-validation-for="Place" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="EventDateLocal" class="form-label"></label>
+        <input asp-for="EventDateLocal" class="form-control" type="text" placeholder="дд.мм.гггг чч:мм" asp-format="{0:dd.MM.yyyy HH:mm}" autocomplete="off" />
+        <span asp-validation-for="EventDateLocal" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegistrationClosesAtLocal" class="form-label"></label>
+        <input asp-for="RegistrationClosesAtLocal" class="form-control" type="text" placeholder="дд.мм.гггг" asp-format="{0:dd.MM.yyyy}" autocomplete="off" />
+        <span asp-validation-for="RegistrationClosesAtLocal" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="GroupCount" class="form-label"></label>
+        <input asp-for="GroupCount" class="form-control" type="number" min="1" />
+        <span asp-validation-for="GroupCount" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Судьи</label>
+        @if (Model.JudgeCandidates.Count == 0)
+        {
+            <div class="text-muted small">Нет пользователей с правом судейства.</div>
+        }
+        else
+        {
+            <div class="list-group">
+                @foreach (var judge in Model.JudgeCandidates)
+                {
+                    var isChecked = Model.JudgeAccountIds.Contains(judge.Id);
+                    <label class="list-group-item">
+                        <input class="form-check-input me-2"
+                               type="checkbox"
+                               name="JudgeAccountIds"
+                               value="@judge.Id"
+                               @(isChecked ? "checked" : null) />
+                        @judge.Name
+                    </label>
+                }
+            </div>
+        }
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Сохранить</button>
+    <a class="btn btn-outline-secondary w-100 py-3" asp-action="Index">Отмена</a>
+</form>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <script>
+        flatpickr('#EventDateLocal', {
+            enableTime: true,
+            time_24hr: true,
+            dateFormat: 'd.m.Y H:i',
+            locale: 'ru',
+            allowInput: true
+        });
+        flatpickr('#RegistrationClosesAtLocal', {
+            enableTime: false,
+            dateFormat: 'd.m.Y',
+            locale: 'ru',
+            allowInput: true
+        });
+    </script>
+}
