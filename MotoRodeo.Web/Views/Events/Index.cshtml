@@ -1,0 +1,34 @@
+@model EventsListDto
+@{
+    ViewData["Title"] = "События";
+}
+<h1 class="h4 mb-3">События</h1>
+
+@if (Model.Current is null && Model.Upcoming.Count == 0 && Model.Past.Count == 0)
+{
+    <div class="alert alert-secondary">Пока нет событий.</div>
+}
+
+@if (Model.Current is not null)
+{
+    <h2 class="h5 mt-3">Текущее</h2>
+    <partial name="_EventListCard" model="Model.Current" />
+}
+
+@if (Model.Upcoming.Count > 0)
+{
+    <h2 class="h5 mt-4">Планируемые</h2>
+    @foreach (var item in Model.Upcoming)
+    {
+        <partial name="_EventListCard" model="item" />
+    }
+}
+
+@if (Model.Past.Count > 0)
+{
+    <h2 class="h5 mt-4">Прошедшие</h2>
+    @foreach (var item in Model.Past)
+    {
+        <partial name="_EventListCard" model="item" />
+    }
+}

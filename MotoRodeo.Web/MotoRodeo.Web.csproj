@@ -19,8 +19,4 @@
     <ProjectReference Include="..\MotoRodeo.BL\MotoRodeo.BL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Filters\" />
-  </ItemGroup>
-
 </Project>

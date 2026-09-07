@@ -16,7 +16,7 @@ var configuration = builder.Configuration;
 Environment.SetEnvironmentVariable("DbConnection", configuration.GetValue<string>("DbConnection"));
 Environment.SetEnvironmentVariable("SecKey", configuration.GetValue<string>("SecKey"));
 Environment.SetEnvironmentVariable("LuckypennyLicenseKey", configuration.GetValue<string>("LuckypennyLicenseKey"));
-Environment.SetEnvironmentVariable("DefaultRegistrationClosesDaysBefore", configuration.GetValue<string>("DefaultRegistrationClosesDaysBefore"));
+Environment.SetEnvironmentVariable("RegistrationClosesDaysBefore", configuration.GetValue<string>("RegistrationClosesDaysBefore"));
 
 Environment.SetEnvironmentVariable("AdminAccountId", configuration.GetValue<string>("AdminAccountId"));
 Environment.SetEnvironmentVariable("AdminAccountLogin", configuration.GetValue<string>("AdminAccountLogin"));
@@ -29,6 +29,8 @@ Environment.SetEnvironmentVariable("SmtpPassword", configuration.GetValue<string
 Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("SmtpFrom"));
 Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
 Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
+
+Environment.SetEnvironmentVariable("EventParticipationApiKey", configuration.GetValue<string>("EventParticipationApiKey"));
 
 #endif
 
@@ -76,6 +78,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
+app.MapControllers();
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

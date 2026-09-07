@@ -37,6 +37,7 @@ public class MotoRodeoContext(DbContextOptions<MotoRodeoContext> options) : DbCo
 
         modelBuilder.Entity<DBEvent>().Property(d => d.Status).HasConversion(new GuidEnumConverterExtension<EventStatusEnum>());
 
+        modelBuilder.Entity<DBEventParticipant>().Property(d => d.Status).HasConversion(new GuidEnumConverterExtension<ParticipantStatusEnum>());
 
         modelBuilder.DisableCascadeDeleteConvention();
         modelBuilder.UseIdentityColumns();
