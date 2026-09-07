@@ -37,18 +37,20 @@ public sealed class GetEventDetailsQueryHandler(
         var currentAccountId = security.CurrentAccountId;
         var isJudge = entity.Judges.Any(j => j.AccountId == currentAccountId);
         var own = entity.Participants.FirstOrDefault(p => p.AccountId == currentAccountId);
+        var canModerate = canManage || isJudge;
 
-        var participants = canManage
+        var participants = canModerate
             ? entity.Participants
                 .OrderBy(p => p.DateCreated)
-                .Select(MapParticipant)
+                .Select(p => MapParticipant(p, canManage, isJudge))
                 .ToList()
             : [];
 
-        EventParticipantDto? currentParticipation = own == null ? null : MapParticipant(own);
+        EventParticipantDto? currentParticipation = own == null
+            ? null
+            : MapParticipant(own, canManage: false, isJudge: false);
 
         var canApply = registrationOpen
-            && security.HasRight(AccountRightEnum.CanParticipate)
             && !isJudge
             && own == null;
 
@@ -69,17 +71,28 @@ public sealed class GetEventDetailsQueryHandler(
             CurrentUserParticipation = currentParticipation,
             CanApply = canApply,
             CurrentUserIsJudge = isJudge,
+            CanModerateParticipants = canModerate,
             RegistrationOpen = registrationOpen
         };
     }
 
-    private static EventParticipantDto MapParticipant(DBEventParticipant p) => new()
+    private static EventParticipantDto MapParticipant(DBEventParticipant p, bool canManage, bool isJudge)
     {
-        Id = p.Id,
-        AccountId = p.AccountId,
-        Name = AccountDisplay.Format(p.Account),
-        Status = p.Status,
-        UsesOwnEquipment = p.UsesOwnEquipment,
-        DateCreated = p.DateCreated
-    };
+        var canConfirm = canManage && p.Status != ParticipantStatusEnum.Confirmed;
+        var canReject = canManage
+            ? p.Status != ParticipantStatusEnum.Rejected
+            : isJudge && p.Status == ParticipantStatusEnum.Confirmed;
+
+        return new EventParticipantDto
+        {
+            Id = p.Id,
+            AccountId = p.AccountId,
+            Name = AccountDisplay.Format(p.Account),
+            Status = p.Status,
+            UsesOwnEquipment = p.UsesOwnEquipment,
+            DateCreated = p.DateCreated,
+            CanConfirm = canConfirm,
+            CanReject = canReject
+        };
+    }
 }

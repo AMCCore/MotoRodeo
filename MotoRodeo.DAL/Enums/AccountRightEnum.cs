@@ -28,11 +28,4 @@ public enum AccountRightEnum
     [Description("Может судить заезды")]
     [EnumGuid("3F7A12C8-5D4E-4A90-8B16-7E2C9D1F4A80")]
     CanJudge,
-
-    /// <summary>
-    /// Может участвовать в событиях.
-    /// </summary>
-    [Description("Может участвовать в событиях")]
-    [EnumGuid("54B8E1D0-2C7F-4E33-A91B-6D0C8F5E2A17")]
-    CanParticipate
 }

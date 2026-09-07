@@ -21,7 +21,7 @@ public sealed class ApplyToEventCommandHandler(
     /// <inheritdoc />
     public async Task Handle(ApplyToEventCommand request, CancellationToken cancellationToken)
     {
-        Access.RequireRight(security, AccountRightEnum.CanParticipate);
+        Access.RequireAuthenticated(security);
 
         var accountId = security.CurrentAccountId;
         logger.LogInformation(

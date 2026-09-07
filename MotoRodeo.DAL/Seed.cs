@@ -1,4 +1,5 @@
 using DMCorp.Framework.Basics.DAL;
+using Microsoft.EntityFrameworkCore;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
 

@@ -11,7 +11,7 @@ using MotoRodeo.DAL.Enums;
 namespace MotoRodeo.BL.Handlers.Events;
 
 /// <summary>
-/// Отклонение заявки кандидата.
+/// Отклонение заявки на участие (администратор мероприятий или судья события).
 /// </summary>
 public sealed class RejectParticipantCommandHandler(
     IUnitOfWork unitOfWork,
@@ -21,11 +21,24 @@ public sealed class RejectParticipantCommandHandler(
     /// <inheritdoc />
     public async Task Handle(RejectParticipantCommand request, CancellationToken cancellationToken)
     {
-        Access.RequireRight(security, AccountRightEnum.ManageEvents);
+        Access.RequireAuthenticated(security);
 
-        logger.LogInformation("Отклонение участника. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
+        logger.LogInformation(
+            "Отклонение участника. EventId={EventId}, AccountId={AccountId}",
+            request.EventId, request.AccountId);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
+
+        var canManage = security.HasRight(AccountRightEnum.ManageEvents);
+        var isEventJudge = !canManage && await unitOfWork.Query<DBEventJudge>()
+            .AnyAsync(
+                j => j.EventId == request.EventId && j.AccountId == security.CurrentAccountId,
+                cancellationToken);
+
+        if (!canManage && !isEventJudge)
+        {
+            throw new UnauthorizedAccessException("Недостаточно прав.");
+        }
 
         var participant = await unitOfWork.Query<DBEventParticipant>()
             .SingleOrDefaultAsync(
@@ -33,11 +46,17 @@ public sealed class RejectParticipantCommandHandler(
                 cancellationToken)
             ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
 
-        if (participant.Status != ParticipantStatusEnum.Draft)
+        if (participant.Status == ParticipantStatusEnum.Rejected)
         {
-            throw new InvalidOperationException("Отклонить можно только кандидата.");
+            throw new InvalidOperationException("Заявка уже отклонена.");
         }
 
+        if (isEventJudge && participant.Status != ParticipantStatusEnum.Confirmed)
+        {
+            throw new InvalidOperationException("Судья может отклонять только подтверждённые заявки.");
+        }
+
+        // Администратор: Draft или Confirmed; судья: только Confirmed.
         participant.Status = ParticipantStatusEnum.Rejected;
         await unitOfWork.CommitAsync(cancellationToken);
 

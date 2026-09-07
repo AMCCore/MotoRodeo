@@ -36,4 +36,14 @@ public sealed class EventParticipantDto
     /// Дата подачи заявки.
     /// </summary>
     public DateTimeOffset DateCreated { get; set; }
+
+    /// <summary>
+    /// Можно ли подтвердить заявку текущему пользователю.
+    /// </summary>
+    public bool CanConfirm { get; set; }
+
+    /// <summary>
+    /// Можно ли отклонить заявку текущему пользователю.
+    /// </summary>
+    public bool CanReject { get; set; }
 }

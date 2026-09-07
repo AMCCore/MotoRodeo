@@ -72,7 +72,7 @@ else if (!Model.RegistrationOpen)
     <div class="alert alert-warning">Регистрация на событие закрыта или событие уже прошло.</div>
 }
 
-@if (canManage)
+@if (Model.CanModerateParticipants)
 {
     <h2 class="h6 mt-3">Заявки участников</h2>
     @if (Model.Participants.Count == 0)
@@ -89,21 +89,27 @@ else if (!Model.RegistrationOpen)
                     <div class="small text-muted mb-2">
                         Статус: @StatusLabel(p.Status) · Техника: @(p.UsesOwnEquipment ? "своя" : "аренда")
                     </div>
-                    @if (p.Status == ParticipantStatusEnum.Draft)
+                    @if (p.CanConfirm || p.CanReject)
                     {
                         <div class="d-flex gap-2">
-                            <form method="post" asp-action="Confirm" class="flex-fill">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="eventId" value="@Model.Id" />
-                                <input type="hidden" name="accountId" value="@p.AccountId" />
-                                <button type="submit" class="btn btn-success w-100 py-2">Подтвердить</button>
-                            </form>
-                            <form method="post" asp-action="Reject" class="flex-fill">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="eventId" value="@Model.Id" />
-                                <input type="hidden" name="accountId" value="@p.AccountId" />
-                                <button type="submit" class="btn btn-outline-danger w-100 py-2">Отклонить</button>
-                            </form>
+                            @if (p.CanConfirm)
+                            {
+                                <form method="post" asp-action="Confirm" class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="eventId" value="@Model.Id" />
+                                    <input type="hidden" name="accountId" value="@p.AccountId" />
+                                    <button type="submit" class="btn btn-success w-100 py-2">Подтвердить</button>
+                                </form>
+                            }
+                            @if (p.CanReject)
+                            {
+                                <form method="post" asp-action="Reject" class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="eventId" value="@Model.Id" />
+                                    <input type="hidden" name="accountId" value="@p.AccountId" />
+                                    <button type="submit" class="btn btn-outline-danger w-100 py-2">Отклонить</button>
+                                </form>
+                            }
                         </div>
                     }
                 </div>

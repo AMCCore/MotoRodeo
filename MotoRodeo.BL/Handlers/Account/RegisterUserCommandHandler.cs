@@ -57,11 +57,6 @@ public sealed class RegisterUserCommandHandler(
             Password = BCrypt.Net.BCrypt.HashPassword(request.Password, 11),
             AccountLoginType = AccountLoginTypeEnum.Login
         });
-        unitOfWork.AddEntity(new DBAccountRight
-        {
-            AccountId = account.Id,
-            Right = AccountRightEnum.CanParticipate
-        });
 
         await unitOfWork.CommitAsync(cancellationToken);
 

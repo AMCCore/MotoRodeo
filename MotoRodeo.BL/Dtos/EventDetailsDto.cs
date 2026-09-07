@@ -48,7 +48,7 @@ public sealed class EventDetailsDto
     public IReadOnlyList<NamedAccountDto> Judges { get; set; } = [];
 
     /// <summary>
-    /// Заявки участников (для администратора — все; иначе может быть пусто).
+    /// Заявки участников (для администратора и судьи события).
     /// </summary>
     public IReadOnlyList<EventParticipantDto> Participants { get; set; } = [];
 
@@ -66,6 +66,11 @@ public sealed class EventDetailsDto
     /// Текущий пользователь является судьёй этого события.
     /// </summary>
     public bool CurrentUserIsJudge { get; set; }
+
+    /// <summary>
+    /// Текущий пользователь может управлять заявками (подтверждать/отклонять).
+    /// </summary>
+    public bool CanModerateParticipants { get; set; }
 
     /// <summary>
     /// Регистрация ещё открыта.

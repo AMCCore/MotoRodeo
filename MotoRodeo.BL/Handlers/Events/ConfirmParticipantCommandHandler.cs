@@ -11,7 +11,7 @@ using MotoRodeo.DAL.Enums;
 namespace MotoRodeo.BL.Handlers.Events;
 
 /// <summary>
-/// Подтверждение участия кандидата.
+/// Подтверждение заявки на участие (администратор мероприятий).
 /// </summary>
 public sealed class ConfirmParticipantCommandHandler(
     IUnitOfWork unitOfWork,
@@ -23,18 +23,27 @@ public sealed class ConfirmParticipantCommandHandler(
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
 
-        logger.LogInformation("Подтверждение участника. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
+        logger.LogInformation(
+            "Подтверждение участника. EventId={EventId}, AccountId={AccountId}",
+            request.EventId, request.AccountId);
 
-        var participant = await unitOfWork.Query<DBEventParticipant>().SingleOrDefaultAsync(x => x.EventId == request.EventId && x.AccountId == request.AccountId, cancellationToken) ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
+        var participant = await unitOfWork.Query<DBEventParticipant>()
+            .SingleOrDefaultAsync(
+                x => x.EventId == request.EventId && x.AccountId == request.AccountId,
+                cancellationToken)
+            ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
 
-        if (participant.Status != ParticipantStatusEnum.Draft)
+        if (participant.Status == ParticipantStatusEnum.Confirmed)
         {
-            throw new InvalidOperationException("Подтвердить можно только кандидата.");
+            throw new InvalidOperationException("Заявка уже подтверждена.");
         }
 
+        // Администратор может подтверждать новые и ранее отклонённые заявки.
         participant.Status = ParticipantStatusEnum.Confirmed;
         await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
-        logger.LogInformation("Участник подтверждён. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
+        logger.LogInformation(
+            "Участник подтверждён. EventId={EventId}, AccountId={AccountId}",
+            request.EventId, request.AccountId);
     }
 }
