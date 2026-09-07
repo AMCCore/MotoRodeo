@@ -21,22 +21,11 @@ public sealed class ConfirmParticipantCommandHandler(
     /// <inheritdoc />
     public async Task Handle(ConfirmParticipantCommand request, CancellationToken cancellationToken)
     {
-        if (!request.IsExternalApi)
-        {
-            Access.RequireRight(security, AccountRightEnum.ManageEvents);
-        }
+        Access.RequireRight(security, AccountRightEnum.ManageEvents);
 
-        logger.LogInformation(
-            "Подтверждение участника. EventId={EventId}, AccountId={AccountId}, External={External}",
-            request.EventId, request.AccountId, request.IsExternalApi);
+        logger.LogInformation("Подтверждение участника. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
 
-        await unitOfWork.BeginTransactionAsync(cancellationToken);
-
-        var participant = await unitOfWork.Query<DBEventParticipant>()
-            .SingleOrDefaultAsync(
-                x => x.EventId == request.EventId && x.AccountId == request.AccountId,
-                cancellationToken)
-            ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
+        var participant = await unitOfWork.Query<DBEventParticipant>().SingleOrDefaultAsync(x => x.EventId == request.EventId && x.AccountId == request.AccountId, cancellationToken) ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
 
         if (participant.Status != ParticipantStatusEnum.Draft)
         {
@@ -44,10 +33,8 @@ public sealed class ConfirmParticipantCommandHandler(
         }
 
         participant.Status = ParticipantStatusEnum.Confirmed;
-        await unitOfWork.CommitAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
-        logger.LogInformation(
-            "Участник подтверждён. EventId={EventId}, AccountId={AccountId}",
-            request.EventId, request.AccountId);
+        logger.LogInformation("Участник подтверждён. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
     }
 }

@@ -65,11 +65,15 @@ public sealed class RegisterUserCommandHandler(
 
         await unitOfWork.CommitAsync(cancellationToken);
 
+#if !DEBUG
+
         await emailSender.SendAsync(
             email,
             MailOptions.EmailSubjectRegistration,
             MailOptions.EmailTemplateRegistration.Replace("{link}", request.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
             cancellationToken);
+
+#endif
 
         logger.LogInformation("Пользователь зарегистрирован. AccountId={AccountId}, Email={Email}", account.Id, email);
     }

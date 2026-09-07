@@ -21,14 +21,9 @@ public sealed class RejectParticipantCommandHandler(
     /// <inheritdoc />
     public async Task Handle(RejectParticipantCommand request, CancellationToken cancellationToken)
     {
-        if (!request.IsExternalApi)
-        {
-            Access.RequireRight(security, AccountRightEnum.ManageEvents);
-        }
+        Access.RequireRight(security, AccountRightEnum.ManageEvents);
 
-        logger.LogInformation(
-            "Отклонение участника. EventId={EventId}, AccountId={AccountId}, External={External}",
-            request.EventId, request.AccountId, request.IsExternalApi);
+        logger.LogInformation("Отклонение участника. EventId={EventId}, AccountId={AccountId}", request.EventId, request.AccountId);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
 

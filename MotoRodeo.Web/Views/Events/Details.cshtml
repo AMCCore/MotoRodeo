@@ -47,7 +47,7 @@ else if (Model.CurrentUserParticipation is not null)
     var p = Model.CurrentUserParticipation;
     <div class="alert alert-secondary">
         Ваша заявка: <strong>@StatusLabel(p.Status)</strong>.
-        Техника: @(p.UsesOwnEquipment ? "своя" : "аренда организатора").
+        Техника: @(p.UsesOwnEquipment ? "своя" : "аренда").
     </div>
 }
 else if (Model.CanApply)
@@ -87,8 +87,7 @@ else if (!Model.RegistrationOpen)
                 <div class="list-group-item">
                     <div class="fw-semibold">@p.Name</div>
                     <div class="small text-muted mb-2">
-                        @StatusLabel(p.Status) · @(p.UsesOwnEquipment ? "своя техника" : "аренда") ·
-                        @p.DateCreated.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                        Статус: @StatusLabel(p.Status) · Техника: @(p.UsesOwnEquipment ? "своя" : "аренда")
                     </div>
                     @if (p.Status == ParticipantStatusEnum.Draft)
                     {

@@ -23,7 +23,7 @@ public sealed class EventParticipationController(IMediator mediator, ILogger<Eve
     {
         try
         {
-            await mediator.Send(new ConfirmParticipantCommand(eventId, accountId, IsExternalApi: true), token);
+            await mediator.Send(new ConfirmParticipantCommand(eventId, accountId), token);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -46,7 +46,7 @@ public sealed class EventParticipationController(IMediator mediator, ILogger<Eve
     {
         try
         {
-            await mediator.Send(new RejectParticipantCommand(eventId, accountId, IsExternalApi: true), token);
+            await mediator.Send(new RejectParticipantCommand(eventId, accountId), token);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
