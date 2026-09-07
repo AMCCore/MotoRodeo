@@ -11,11 +11,11 @@
     <input type="hidden" asp-for="ReturnUrl" />
     <div class="mb-3">
         <label asp-for="Login" class="form-label"></label>
-        <input asp-for="Login" class="form-control" autocomplete="username" type="email" />
+        <input asp-for="Login" class="form-control" autocomplete="username" type="text" />
     </div>
     <div class="mb-3">
         <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+        <input asp-for="Password" class="form-control" autocomplete="current-password" type="password" />
     </div>
     <div class="form-check mb-3">
         <input asp-for="RememberMe" class="form-check-input remember-me-checkbox" />
