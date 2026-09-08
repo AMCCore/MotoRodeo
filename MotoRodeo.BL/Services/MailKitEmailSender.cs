@@ -1,6 +1,5 @@
 using DMCorp.Framework.Basics.Settings;
 using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
@@ -23,9 +22,7 @@ public sealed class MailKitEmailSender(IEmailServiceSettings settings, ILogger<M
             message.Body = new TextPart("plain") { Text = body };
 
             using var client = new SmtpClient();
-            var secureSocketOptions = !MailOptions.SmtpUseSsl ? SecureSocketOptions.None : settings.Port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
-
-            await client.ConnectAsync(settings.Host, settings.Port, secureSocketOptions, cancellationToken);
+            await client.ConnectAsync(settings.Host, settings.Port, MailOptions.GetSecureSocketOptions(settings.Port), cancellationToken);
 
             if (!string.IsNullOrWhiteSpace(settings.Login))
             {
