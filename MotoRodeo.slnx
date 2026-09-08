@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="DockerfileMotoRodeoWeb" />
+  </Folder>
   <Project Path="MotoRodeo.BL/MotoRodeo.BL.csproj" />
   <Project Path="MotoRodeo.DAL/MotoRodeo.DAL.csproj" />
   <Project Path="MotoRodeo.Web/MotoRodeo.Web.csproj" />
