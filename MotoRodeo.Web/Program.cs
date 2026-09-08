@@ -59,10 +59,12 @@ Environment.SetEnvironmentVariable("EventParticipationApiKey", configuration.Get
 #endif
 
 
-builder.Services.AddControllersWithViews(options =>
-{
-});
+builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
+
+// Настройки приложения
+var gitVersion = MotoRodeo.Web.Properties.Resource.CurrentCommit;
+Environment.SetEnvironmentVariable("AppVersion", gitVersion[..Math.Min(7, gitVersion.Length)]);
 
 builder.Services.AddDbContext<MotoRodeoContext>(options => options.UseLazyLoadingProxies()
 .UseNpgsql(
@@ -124,5 +126,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
     Predicate = r => r.Tags.Contains("Liveness")
 });
 app.MapHealthChecks("/health/ready");
+
+Console.WriteLine($"Release: {gitVersion}");
 
 app.Run();
