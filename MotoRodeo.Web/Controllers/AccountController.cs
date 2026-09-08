@@ -177,7 +177,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
         try
         {
             await mediator.Send(new ConfirmPasswordResetCommand(ResetRequestId), token);
-            return View(new ConfirmRegistrationModel
+            return View(nameof(ConfirmRegistration), new ConfirmRegistrationModel
             {
                 Success = true,
                 Message = "Пароль для данного пользователя сброшен и отправлен ему на email указанный при регистрации."
@@ -186,7 +186,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Ошибка процедуры сброса пароля. ResetRequestId={ResetRequestId}", ResetRequestId);
-            return View(new ConfirmRegistrationModel
+            return View(nameof(ConfirmRegistration), new ConfirmRegistrationModel
             {
                 Success = false,
                 Message = "Не удалось сбросить пароль. Попробуйте позже."
