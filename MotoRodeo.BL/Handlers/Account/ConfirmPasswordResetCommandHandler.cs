@@ -41,6 +41,15 @@ public sealed class ConfirmPasswordResetCommandHandler(
             throw new Exception("Срок действия ссылки восстановления пароля истёк.");
         }
 
+        var account = await unitOfWork.Query<DBAccount>()
+            .FirstOrDefaultAsync(x => x.Id == resetRequest.AccountId, cancellationToken)
+            ?? throw new Exception("Учётная запись для восстановления не найдена.");
+
+        if (account.IsBlocked)
+        {
+            throw new Exception("Учётная запись заблокирована.");
+        }
+
         var accountLogin = await unitOfWork.Query<DBAccountLogin>()
             .FirstOrDefaultAsync(x => x.AccountId == resetRequest.AccountId && x.AccountLoginType == AccountLoginTypeEnum.Login, cancellationToken)
             ?? throw new Exception("Учётная запись для восстановления не найдена.");

@@ -1,0 +1,14 @@
+@model EventListItemDto
+<div class="card mb-2">
+    <div class="card-body">
+        <h3 class="h6 card-title mb-1">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none">@Model.Title</a>
+        </h3>
+        <p class="card-text mb-1 text-muted small">
+            @Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @Model.Place
+        </p>
+        <p class="card-text mb-0 text-muted small">
+            Регистрация до @Model.RegistrationClosesAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+        </p>
+    </div>
+</div>

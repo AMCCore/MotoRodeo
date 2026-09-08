@@ -1,0 +1,82 @@
+@model AccountDetailsDto
+@{
+    ViewData["Title"] = "Пользователь";
+}
+<h1 class="h4 mb-3">@Model.LastName @Model.FirstName</h1>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Идентификатор</dt>
+            <dd class="col-sm-8">@Model.Identifier</dd>
+
+            <dt class="col-sm-4">Имя</dt>
+            <dd class="col-sm-8">@Model.FirstName</dd>
+
+            <dt class="col-sm-4">Фамилия</dt>
+            <dd class="col-sm-8">@Model.LastName</dd>
+
+            <dt class="col-sm-4">Прозвище</dt>
+            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Nickname) ? "—" : Model.Nickname)</dd>
+
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">@Model.Email</dd>
+
+            <dt class="col-sm-4">Транспорт</dt>
+            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Vehicle) ? "—" : Model.Vehicle)</dd>
+
+            <dt class="col-sm-4">Подтверждён</dt>
+            <dd class="col-sm-8">@(Model.Confirmed ? "Да" : "Нет")</dd>
+
+            <dt class="col-sm-4">Статус</dt>
+            <dd class="col-sm-8">
+                @if (Model.IsBlocked)
+                {
+                    <span class="badge text-bg-danger">Заблокирован</span>
+                }
+                else
+                {
+                    <span class="badge text-bg-success">Активен</span>
+                }
+            </dd>
+
+            <dt class="col-sm-4">Создан</dt>
+            <dd class="col-sm-8">@Model.DateCreated.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-4">Права</dt>
+            <dd class="col-sm-8">
+                @if (Model.Rights.Count == 0)
+                {
+                    <span class="text-muted">Нет</span>
+                }
+                else
+                {
+                    @string.Join(", ", Model.Rights.Select(r => r switch
+                    {
+                        AccountRightEnum.IsAdmin => "Администратор",
+                        AccountRightEnum.ManageEvents => "Админ мероприятий",
+                        AccountRightEnum.CanJudge => "Судья",
+                        _ => r.ToString()
+                    }))
+                }
+            </dd>
+        </dl>
+    </div>
+</div>
+
+@if (Model.IsBlocked)
+{
+    <form method="post" asp-action="Unblock" asp-route-id="@Model.Id" class="mb-2">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-success w-100 py-3">Разблокировать</button>
+    </form>
+}
+else
+{
+    <form method="post" asp-action="Block" asp-route-id="@Model.Id" class="mb-2">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger w-100 py-3">Заблокировать</button>
+    </form>
+}
+
+<a class="btn btn-outline-secondary w-100 py-3" asp-action="Index">К списку</a>

@@ -1,0 +1,104 @@
+using MotoRodeo.DAL.Enums;
+
+namespace MotoRodeo.BL.Dtos;
+
+/// <summary>
+/// Детальная карточка события.
+/// </summary>
+public sealed class EventDetailsDto
+{
+    /// <summary>
+    /// Идентификатор события.
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
+    /// Название.
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Место проведения.
+    /// </summary>
+    public string Place { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Дата и время проведения.
+    /// </summary>
+    public DateTimeOffset EventDate { get; set; }
+
+    /// <summary>
+    /// Дата закрытия регистрации.
+    /// </summary>
+    public DateTimeOffset RegistrationClosesAt { get; set; }
+
+    /// <summary>
+    /// Количество групп.
+    /// </summary>
+    public int GroupCount { get; set; }
+
+    /// <summary>
+    /// Процессный статус события.
+    /// </summary>
+    public EventStatusEnum Status { get; set; }
+
+    /// <summary>
+    /// Судьи события.
+    /// </summary>
+    public IReadOnlyList<NamedAccountDto> Judges { get; set; } = [];
+
+    /// <summary>
+    /// Заявки участников (для администратора и судьи события).
+    /// </summary>
+    public IReadOnlyList<EventParticipantDto> Participants { get; set; } = [];
+
+    /// <summary>
+    /// Заявка текущего пользователя, если есть.
+    /// </summary>
+    public EventParticipantDto? CurrentUserParticipation { get; set; }
+
+    /// <summary>
+    /// Можно ли подать заявку сейчас.
+    /// </summary>
+    public bool CanApply { get; set; }
+
+    /// <summary>
+    /// Текущий пользователь является судьёй этого события.
+    /// </summary>
+    public bool CurrentUserIsJudge { get; set; }
+
+    /// <summary>
+    /// Текущий пользователь может управлять заявками (подтверждать/отклонять).
+    /// </summary>
+    public bool CanModerateParticipants { get; set; }
+
+    /// <summary>
+    /// Подпись статуса для UI (с учётом правила «сутки после даты»).
+    /// </summary>
+    public string StatusDisplayLabel { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Можно ли начать мероприятие.
+    /// </summary>
+    public bool CanStartEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли завершить мероприятие.
+    /// </summary>
+    public bool CanCompleteEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли отменить планируемое мероприятие.
+    /// </summary>
+    public bool CanCancelEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли редактировать карточку события.
+    /// </summary>
+    public bool CanEditEvent { get; set; }
+
+    /// <summary>
+    /// Регистрация ещё открыта.
+    /// </summary>
+    public bool RegistrationOpen { get; set; }
+}

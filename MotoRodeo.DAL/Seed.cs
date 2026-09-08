@@ -1,4 +1,5 @@
 using DMCorp.Framework.Basics.DAL;
+using Microsoft.EntityFrameworkCore;
 using MotoRodeo.DAL.Entities;
 using MotoRodeo.DAL.Enums;
 
@@ -25,6 +26,8 @@ public static class Seed
     /// <param name="adminName">Отображаемое имя администратора.</param>
     public static void SeedData(this IUnitOfWork uw)
     {
+        uw.BeginTransaction();
+
         uw.NotChangeLastUpdateTick = true;
 
         if (!uw.Query<DBAccount>().Any(x => x.Id == AdminAccountId))
@@ -60,6 +63,6 @@ public static class Seed
             });
         }
 
-        uw.SaveChanges();
+        uw.Commit();
     }
 }

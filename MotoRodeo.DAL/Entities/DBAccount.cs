@@ -67,6 +67,17 @@ public class DBAccount : IEntityBase, ISoftDeleteEntity, IEntityWithDateCreated
     public bool Confirmed { get; set; } = true;
 
     /// <summary>
+    /// Учётная запись заблокирована администратором.
+    /// </summary>
+    public bool IsBlocked { get; set; }
+
+    /// <summary>
+    /// Транспортное средство пользователя.
+    /// </summary>
+    [MaxLength(255)]
+    public string? Vehicle { get; set; }
+
+    /// <summary>
     /// Набор прав пользователя.
     /// </summary>
     public virtual ICollection<DBAccountRight> AccountRights { get; set; } = new List<DBAccountRight>();

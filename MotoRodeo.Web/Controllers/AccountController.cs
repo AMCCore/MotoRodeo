@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoRodeo.BL.Commands.Account;
+using MotoRodeo.BL.Dtos;
 using MotoRodeo.Web.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -113,6 +114,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
                 form.Nickname,
                 form.Email,
                 form.Password,
+                form.Vehicle,
                 id => Url.Action(
                     nameof(ConfirmRegistration),
                     "Account",
@@ -213,6 +215,102 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
         logger.LogInformation("Пользователь вышел из системы. AccountId={AccountId}", accountId);
         return RedirectToAction(nameof(Login));
     }
+
+    /// <summary>
+    /// Отображает профиль текущего пользователя.
+    /// </summary>
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> Profile(CancellationToken token)
+    {
+        var profile = await mediator.Send(new GetMyProfileQuery(), token);
+        return View(ToProfileForm(profile));
+    }
+
+    /// <summary>
+    /// Сохраняет изменения профиля текущего пользователя.
+    /// </summary>
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Profile(ProfileForm form, CancellationToken token)
+    {
+        // Email не редактируется — подставляем актуальное значение из БД.
+        var current = await mediator.Send(new GetMyProfileQuery(), token);
+        form.Email = current.Email;
+
+        if (!ModelState.IsValid)
+        {
+            return View(form);
+        }
+
+        try
+        {
+            await mediator.Send(new UpdateMyProfileCommand(
+                form.FirstName,
+                form.LastName,
+                form.Nickname,
+                form.Vehicle), token);
+
+            form.Info = "Профиль сохранён.";
+            return View(form);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
+        {
+            logger.LogWarning(ex, "Ошибка сохранения профиля.");
+            form.Error = ex.Message;
+            return View(form);
+        }
+    }
+
+    /// <summary>
+    /// Форма смены пароля.
+    /// </summary>
+    [Authorize]
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+        return View(new ChangePasswordForm());
+    }
+
+    /// <summary>
+    /// Меняет пароль текущего пользователя.
+    /// </summary>
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordForm form, CancellationToken token)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(form);
+        }
+
+        try
+        {
+            await mediator.Send(new ChangePasswordCommand(form.CurrentPassword, form.NewPassword), token);
+            form = new ChangePasswordForm { Info = "Пароль изменён." };
+            return View(form);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
+        {
+            logger.LogWarning(ex, "Ошибка смены пароля.");
+            form.CurrentPassword = string.Empty;
+            form.NewPassword = string.Empty;
+            form.ConfirmPassword = string.Empty;
+            form.Error = ex.Message;
+            return View(form);
+        }
+    }
+
+    private static ProfileForm ToProfileForm(MyProfileDto profile) => new()
+    {
+        FirstName = profile.FirstName,
+        LastName = profile.LastName,
+        Nickname = profile.Nickname,
+        Email = profile.Email,
+        Vehicle = profile.Vehicle
+    };
 
     private async Task SignInAsync(Guid accountId, bool persistent, CancellationToken token)
     {

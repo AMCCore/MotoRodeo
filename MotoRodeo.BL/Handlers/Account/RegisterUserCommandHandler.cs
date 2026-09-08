@@ -31,6 +31,7 @@ public sealed class RegisterUserCommandHandler(
         var lastName = request.LastName.Trim();
         var email = request.Email.Trim().ToLowerInvariant();
         var nickname = request.Nickname?.Trim();
+        var vehicle = string.IsNullOrWhiteSpace(request.Vehicle) ? null : request.Vehicle.Trim();
 
         logger.LogInformation("Начало регистрации пользователя. Email={Email}", email);
 
@@ -46,6 +47,7 @@ public sealed class RegisterUserCommandHandler(
             FirstName = firstName,
             LastName = lastName,
             Login = nickname,
+            Vehicle = vehicle,
             Confirmed = false,
             DateCreated = DateTimeOffset.UtcNow
         };
@@ -57,19 +59,18 @@ public sealed class RegisterUserCommandHandler(
             Password = BCrypt.Net.BCrypt.HashPassword(request.Password, 11),
             AccountLoginType = AccountLoginTypeEnum.Login
         });
-        unitOfWork.AddEntity(new DBAccountRight
-        {
-            AccountId = account.Id,
-            Right = AccountRightEnum.CanParticipate
-        });
 
         await unitOfWork.CommitAsync(cancellationToken);
+
+#if !DEBUG
 
         await emailSender.SendAsync(
             email,
             MailOptions.EmailSubjectRegistration,
             MailOptions.EmailTemplateRegistration.Replace("{link}", request.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
             cancellationToken);
+
+#endif
 
         logger.LogInformation("Пользователь зарегистрирован. AccountId={AccountId}, Email={Email}", account.Id, email);
     }

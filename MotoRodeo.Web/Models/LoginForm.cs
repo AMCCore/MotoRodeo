@@ -11,7 +11,6 @@ public sealed class LoginForm
     /// Электронная почта (логин).
     /// </summary>
     [Required]
-    [EmailAddress]
     [Display(Name = "Электронная почта")]
     public string Login { get; set; } = string.Empty;
 
