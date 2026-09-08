@@ -168,6 +168,33 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
         }
     }
 
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("ConfirmPasswordReset/{ResetRequestId}")]
+    public async Task<IActionResult> ConfirmPasswordReset(Guid ResetRequestId, CancellationToken token = default)
+    {
+        logger.LogInformation("Начало процедуры сброса пароля. ResetRequestId={ResetRequestId}", ResetRequestId);
+        try
+        {
+            await mediator.Send(new ConfirmPasswordResetCommand(ResetRequestId), token);
+            return View(new ConfirmRegistrationModel
+            {
+                Success = true,
+                Message = "Пароль для данного пользователя сброшен и отправлен ему на email указанный при регистрации."
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Ошибка процедуры сброса пароля. ResetRequestId={ResetRequestId}", ResetRequestId);
+            return View(new ConfirmRegistrationModel
+            {
+                Success = false,
+                Message = "Не удалось сбросить пароль. Попробуйте позже."
+            });
+        }
+
+    }
+
 
     /// <summary>
     /// Отображает форму запроса восстановления пароля.
@@ -196,7 +223,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
             return View(form);
         }
 
-        await mediator.Send(new RequestPasswordResetCommand(form.Email, id => Url.Action("ConfirmPasswordReset", "Accounts", new { id }, Request.Scheme)!), token);
+        await mediator.Send(new RequestPasswordResetCommand(form.Email, id => Url.Action("ConfirmPasswordReset", "Account", new { id }, Request.Scheme)!), token);
         form.Info = "Cсылка для восстановления пароля отправлена на указанный email.";
         return View(form);
     }

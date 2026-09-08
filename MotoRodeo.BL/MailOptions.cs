@@ -1,3 +1,5 @@
+using MailKit.Security;
+
 namespace MotoRodeo.BL;
 
 /// <summary>
@@ -14,6 +16,16 @@ public static class MailOptions
     /// Использовать SSL/TLS при подключении к SMTP.
     /// </summary>
     public static bool SmtpUseSsl => bool.Parse(Environment.GetEnvironmentVariable(nameof(SmtpUseSsl)) ?? "true");
+
+    /// <summary>
+    /// Режим SSL/TLS для MailKit: implicit SSL на 465, иначе STARTTLS.
+    /// </summary>
+    public static SecureSocketOptions GetSecureSocketOptions(int port) =>
+        !SmtpUseSsl
+            ? SecureSocketOptions.None
+            : port == 465
+                ? SecureSocketOptions.SslOnConnect
+                : SecureSocketOptions.StartTls;
 
     /// <summary>
     /// Тема письма со ссылкой на восстановление пароля.
