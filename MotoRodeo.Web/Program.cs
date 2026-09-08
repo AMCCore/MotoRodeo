@@ -93,10 +93,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 //health checks
 builder.Services.AddHealthChecks()
-    .AddCheck<SimpleHealthCheck>("simple_check", tags: ["Liveness"])
-    .AddCheck<SimpleDbCheck>("simple_db_check", tags: ["Readiness"])
-    .AddCheck<DbMigrationsHealthCheck>("simple_db_migration_check", tags: ["Readiness"])
-    .AddCheck<SMTPHealthChecks>("smtp_check", tags: ["Readiness"]);
+    .AddCheck<SimpleHealthCheck>("simple_check", tags: ["Liveness", "Readiness"])
+    .AddCheck<SimpleDbCheck>("simple_db_check", tags: ["Readiness", "Startup"])
+    .AddCheck<DbMigrationsHealthCheck>("simple_db_migration_check", tags: ["Startup"])
+    .AddCheck<SMTPHealthChecks>("smtp_check", tags: ["Startup"]);
 
 //---------------------------------------------
 var app = builder.Build();
@@ -125,7 +125,14 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 {
     Predicate = r => r.Tags.Contains("Liveness")
 });
-app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("Readiness")
+});
+app.MapHealthChecks("/health/startup", new HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("Startup")
+});
 
 Console.WriteLine($"Release: {gitVersion}");
 
