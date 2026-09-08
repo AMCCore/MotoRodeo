@@ -23,11 +23,7 @@ public sealed class MailKitEmailSender(IEmailServiceSettings settings, ILogger<M
             message.Body = new TextPart("plain") { Text = body };
 
             using var client = new SmtpClient();
-            var secureSocketOptions = !MailOptions.SmtpUseSsl
-                ? SecureSocketOptions.None
-                : settings.Port == 465
-                    ? SecureSocketOptions.SslOnConnect
-                    : SecureSocketOptions.StartTls;
+            var secureSocketOptions = !MailOptions.SmtpUseSsl ? SecureSocketOptions.None : settings.Port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
 
             await client.ConnectAsync(settings.Host, settings.Port, secureSocketOptions, cancellationToken);
 
