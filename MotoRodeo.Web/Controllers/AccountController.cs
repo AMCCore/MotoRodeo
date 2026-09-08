@@ -223,7 +223,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
             return View(form);
         }
 
-        await mediator.Send(new RequestPasswordResetCommand(form.Email, id => Url.Action("ConfirmPasswordReset", "Account", new { id }, Request.Scheme)!), token);
+        await mediator.Send(new RequestPasswordResetCommand(form.Email, ResetRequestId => Url.Action(nameof(ConfirmPasswordReset), "Account", new { ResetRequestId }, Request.Scheme)!), token);
         form.Info = "Cсылка для восстановления пароля отправлена на указанный email.";
         return View(form);
     }

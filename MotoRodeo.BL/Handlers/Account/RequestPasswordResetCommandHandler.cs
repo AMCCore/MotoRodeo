@@ -34,6 +34,8 @@ public sealed class RequestPasswordResetCommandHandler(
             return;
         }
 
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
+
         var accountLogin = await unitOfWork.Query<DBAccountLogin>()
             .Where(x => x.AccountLoginType == AccountLoginTypeEnum.Login
                         && x.Login == email
@@ -53,9 +55,11 @@ public sealed class RequestPasswordResetCommandHandler(
             DateCreated = DateTimeOffset.UtcNow
         };
         unitOfWork.AddEntity(resetRequest);
-        await unitOfWork.SaveChangesAsync(token: cancellationToken);
-
+        
         var link = request.ResetLinkFactory(resetRequest.Id);
+
+        await unitOfWork.CommitAsync(cancellationToken);
+
         var body = MailOptions.EmailTemplatePasswordReset.Replace("{link}", link, StringComparison.Ordinal);
         await emailSender.SendAsync(accountLogin.Login, MailOptions.EmailSubjectPasswordReset, body, cancellationToken);
 

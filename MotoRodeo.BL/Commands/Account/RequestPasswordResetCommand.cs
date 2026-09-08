@@ -7,6 +7,4 @@ namespace MotoRodeo.BL.Commands.Account;
 /// </summary>
 /// <param name="Email">Электронная почта (логин).</param>
 /// <param name="ResetLinkFactory">Фабрика абсолютной ссылки восстановления по Id записи запроса.</param>
-public sealed record RequestPasswordResetCommand(
-    string Email,
-    Func<Guid, string> ResetLinkFactory) : IRequest;
+public sealed record RequestPasswordResetCommand(string Email, Func<Guid, string> ResetLinkFactory) : IRequest;
