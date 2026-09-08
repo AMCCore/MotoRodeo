@@ -10,7 +10,6 @@ namespace MotoRodeo.BL.Commands.Events;
 /// <param name="Place">Место.</param>
 /// <param name="EventDate">Дата проведения.</param>
 /// <param name="RegistrationClosesAt">Закрытие регистрации.</param>
-/// <param name="GroupCount">Количество групп.</param>
 /// <param name="JudgeAccountIds">Идентификаторы судей.</param>
 public sealed record UpdateEventCommand(
     Guid EventId,
@@ -18,5 +17,4 @@ public sealed record UpdateEventCommand(
     string Place,
     DateTimeOffset EventDate,
     DateTimeOffset RegistrationClosesAt,
-    int GroupCount,
     IReadOnlyList<Guid> JudgeAccountIds) : IRequest;

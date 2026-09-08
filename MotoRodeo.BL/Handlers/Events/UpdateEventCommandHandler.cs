@@ -23,7 +23,7 @@ public sealed class UpdateEventCommandHandler(
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
         EventJudgeRules.ValidateEventFields(
-            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt, request.GroupCount);
+            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt);
 
         logger.LogInformation("Редактирование события. EventId={EventId}", request.EventId);
 
@@ -43,7 +43,8 @@ public sealed class UpdateEventCommandHandler(
         entity.Place = request.Place.Trim();
         entity.EventDate = request.EventDate;
         entity.RegistrationClosesAt = request.RegistrationClosesAt;
-        entity.GroupCount = request.GroupCount;
+
+        await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
         var existingJudgeIds = entity.Judges.Select(j => j.AccountId).ToHashSet();
         var toRemove = entity.Judges.Where(j => !judgeIds.Contains(j.AccountId)).ToList();

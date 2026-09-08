@@ -32,11 +32,6 @@
         <span asp-validation-for="RegistrationClosesAtLocal" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="GroupCount" class="form-label"></label>
-        <input asp-for="GroupCount" class="form-control" type="number" min="1" />
-        <span asp-validation-for="GroupCount" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
         <label class="form-label">Судьи</label>
         @if (Model.JudgeCandidates.Count == 0)
         {

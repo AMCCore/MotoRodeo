@@ -22,8 +22,7 @@
     <div class="card-body">
         <p class="mb-1"><strong>Место:</strong> @Model.Place</p>
         <p class="mb-1"><strong>Дата:</strong> @Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
-        <p class="mb-1"><strong>Регистрация до:</strong> @Model.RegistrationClosesAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
-        <p class="mb-0"><strong>Групп:</strong> @Model.GroupCount</p>
+        <p class="mb-0"><strong>Регистрация до:</strong> @Model.RegistrationClosesAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
     </div>
 </div>
 
@@ -74,7 +73,33 @@ else if (!Model.RegistrationOpen)
 
 @if (Model.CanModerateParticipants)
 {
-    <h2 class="h6 mt-3">Заявки участников</h2>
+    <div class="d-flex justify-content-between align-items-center gap-2 mt-3 mb-2">
+        <h2 class="h6 mb-0">Заявки участников</h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                Выгрузить участников
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item"
+                       asp-action="ExportParticipants"
+                       asp-route-id="@Model.Id"
+                       asp-route-format="view"
+                       target="_blank"
+                       rel="noopener">Открыть для печати</a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                       asp-action="ExportParticipants"
+                       asp-route-id="@Model.Id"
+                       asp-route-format="file">Скачать файл</a>
+                </li>
+            </ul>
+        </div>
+    </div>
     @if (Model.Participants.Count == 0)
     {
         <div class="alert alert-secondary">Заявок пока нет.</div>

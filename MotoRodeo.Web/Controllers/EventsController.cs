@@ -1,3 +1,4 @@
+using System.Text;
 using DMCorp.Framework.Basics.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -77,7 +78,6 @@ public class EventsController(
             Place = "Мотошкола Дзен",
             EventDateLocal = ToLocalInput(eventDate),
             RegistrationClosesAtLocal = ToLocalInput(closes),
-            GroupCount = 4,
             JudgeCandidates = candidates
         });
     }
@@ -116,7 +116,6 @@ public class EventsController(
                 Place = details.Place,
                 EventDateLocal = ToLocalInput(details.EventDate),
                 RegistrationClosesAtLocal = ToLocalInput(details.RegistrationClosesAt),
-                GroupCount = details.GroupCount,
                 JudgeAccountIds = selected,
                 JudgeCandidates = merged
             });
@@ -161,7 +160,6 @@ public class EventsController(
                     form.Place,
                     eventDate,
                     closesAt,
-                    form.GroupCount,
                     form.JudgeAccountIds), token);
                 TempData["Info"] = "Событие создано.";
                 return RedirectToAction(nameof(Details), new { id });
@@ -173,7 +171,6 @@ public class EventsController(
                 form.Place,
                 eventDate,
                 closesAt,
-                form.GroupCount,
                 form.JudgeAccountIds), token);
             TempData["Info"] = "Событие сохранено.";
             return RedirectToAction(nameof(Details), new { id = form.Id });
@@ -262,6 +259,87 @@ public class EventsController(
         }
 
         return RedirectToAction(nameof(Details), new { id = eventId });
+    }
+
+    /// <summary>
+    /// Выгрузка подтверждённых участников: печать (view) или CSV-файл (file).
+    /// </summary>
+    [HttpGet]
+    [Route("/Event/{id}/participants/export")]
+    public async Task<IActionResult> ExportParticipants(
+        Guid id,
+        string format = "view",
+        CancellationToken token = default)
+    {
+        try
+        {
+            var export = await mediator.Send(new GetConfirmedParticipantsExportQuery(id), token);
+            if (string.Equals(format, "file", StringComparison.OrdinalIgnoreCase))
+            {
+                var bytes = BuildParticipantsCsv(export);
+                var fileName = BuildExportFileName(export);
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+
+            return View(export);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return View("Forbidden");
+        }
+    }
+
+    private static byte[] BuildParticipantsCsv(ConfirmedParticipantsExportDto export)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(CsvCell(export.Title));
+        sb.AppendLine(CsvCell(export.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")));
+        sb.AppendLine();
+        sb.AppendLine(string.Join(';', "№", "Фамилия Имя (Прозвище)", "Мотоцикл"));
+
+        foreach (var row in export.Rows)
+        {
+            sb.AppendLine(string.Join(';',
+                CsvCell(row.RowNumber.ToString()),
+                CsvCell(row.DisplayName),
+                CsvCell(row.Motorcycle)));
+        }
+
+        var preamble = Encoding.UTF8.GetPreamble();
+        var content = Encoding.UTF8.GetBytes(sb.ToString());
+        var result = new byte[preamble.Length + content.Length];
+        Buffer.BlockCopy(preamble, 0, result, 0, preamble.Length);
+        Buffer.BlockCopy(content, 0, result, preamble.Length, content.Length);
+        return result;
+    }
+
+    private static string CsvCell(string value)
+    {
+        if (value.Contains('"') || value.Contains(';') || value.Contains('\n') || value.Contains('\r'))
+        {
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
+
+        return value;
+    }
+
+    private static string BuildExportFileName(ConfirmedParticipantsExportDto export)
+    {
+        var date = export.EventDate.ToLocalTime().ToString("yyyy-MM-dd");
+        var title = string.Join("_", export.Title.Split(
+            Path.GetInvalidFileNameChars(),
+            StringSplitOptions.RemoveEmptyEntries)).Trim();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            title = "event";
+        }
+
+        return $"uchastniki_{title}_{date}.csv";
     }
 
     private async Task<IReadOnlyList<NamedAccountDto>> LoadJudgeCandidatesForFormAsync(

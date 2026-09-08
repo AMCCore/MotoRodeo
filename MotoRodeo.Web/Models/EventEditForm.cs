@@ -48,14 +48,6 @@ public sealed class EventEditForm
     public DateTime RegistrationClosesAtLocal { get; set; }
 
     /// <summary>
-    /// Количество групп.
-    /// </summary>
-    [Required]
-    [Range(1, 100)]
-    [Display(Name = "Количество групп")]
-    public int GroupCount { get; set; } = 4;
-
-    /// <summary>
     /// Выбранные судьи.
     /// </summary>
     [Display(Name = "Судьи")]

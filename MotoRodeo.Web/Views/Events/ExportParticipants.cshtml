@@ -1,0 +1,91 @@
+@model ConfirmedParticipantsExportDto
+@{
+    Layout = null;
+    ViewData["Title"] = $"Участники — {Model.Title}";
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            color: #111;
+            margin: 24px;
+            background: #fff;
+        }
+        h1 {
+            font-size: 22px;
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+        .event-date {
+            font-size: 16px;
+            margin: 0 0 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+        }
+        th {
+            background: #e8e8e8;
+            font-weight: 700;
+        }
+        tbody tr:nth-child(even) {
+            background: #f0f0f0;
+        }
+        .col-num {
+            width: 4rem;
+            text-align: center;
+        }
+        .empty {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        @@media print {
+            body { margin: 12mm; }
+        }
+    </style>
+</head>
+<body>
+    <h1>@Model.Title</h1>
+    <p class="event-date">@Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p class="empty">Нет подтверждённых участников.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-num">№</th>
+                    <th>Фамилия Имя (Прозвище)</th>
+                    <th>Мотоцикл</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td class="col-num">@row.RowNumber</td>
+                    <td>@row.DisplayName</td>
+                    <td>@row.Motorcycle</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</body>
+</html>

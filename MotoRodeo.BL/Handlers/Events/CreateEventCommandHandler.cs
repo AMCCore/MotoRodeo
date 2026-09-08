@@ -56,8 +56,7 @@ internal static class EventJudgeRules
         string title,
         string place,
         DateTimeOffset eventDate,
-        DateTimeOffset registrationClosesAt,
-        int groupCount)
+        DateTimeOffset registrationClosesAt)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -67,11 +66,6 @@ internal static class EventJudgeRules
         if (string.IsNullOrWhiteSpace(place))
         {
             throw new InvalidOperationException("Укажите место проведения.");
-        }
-
-        if (groupCount < 1)
-        {
-            throw new InvalidOperationException("Количество групп должно быть не меньше 1.");
         }
 
         if (registrationClosesAt > eventDate)
@@ -94,7 +88,7 @@ public sealed class CreateEventCommandHandler(
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
         EventJudgeRules.ValidateEventFields(
-            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt, request.GroupCount);
+            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt);
 
         var judgeIds = await EventJudgeRules.ValidateJudgesAsync(
             unitOfWork, request.JudgeAccountIds, [], cancellationToken);
@@ -109,7 +103,7 @@ public sealed class CreateEventCommandHandler(
             Place = request.Place.Trim(),
             EventDate = request.EventDate,
             RegistrationClosesAt = request.RegistrationClosesAt,
-            GroupCount = request.GroupCount,
+            GroupCount = 1,
             Status = EventStatusEnum.Published,
             DateCreated = DateTimeOffset.UtcNow
         };
