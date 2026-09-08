@@ -1,3 +1,4 @@
+using DMCorp.Framework.Basics.Settings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace MotoRodeo.BL.Services;
 /// <summary>
 /// Отправка писем через MailKit по настройкам из переменных окружения.
 /// </summary>
-public sealed class MailKitEmailSender(ILogger<MailKitEmailSender> logger) : IEmailSender
+public sealed class MailKitEmailSender(IEmailServiceSettings settings, ILogger<MailKitEmailSender> logger) : IEmailSender
 {
     /// <inheritdoc />
     public async Task SendAsync(string to, string subject, string body, CancellationToken cancellationToken = default)
@@ -16,7 +17,7 @@ public sealed class MailKitEmailSender(ILogger<MailKitEmailSender> logger) : IEm
         try
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(MailOptions.SmtpFromName, MailOptions.SmtpFrom));
+            message.From.Add(new MailboxAddress(MailOptions.SmtpFromName, settings.OutAddress ?? "info@moto.rodeo"));
             message.To.Add(MailboxAddress.Parse(to));
             message.Subject = subject;
             message.Body = new TextPart("plain") { Text = body };
@@ -24,15 +25,15 @@ public sealed class MailKitEmailSender(ILogger<MailKitEmailSender> logger) : IEm
             using var client = new SmtpClient();
             var secureSocketOptions = !MailOptions.SmtpUseSsl
                 ? SecureSocketOptions.None
-                : MailOptions.SmtpPort == 465
+                : settings.Port == 465
                     ? SecureSocketOptions.SslOnConnect
                     : SecureSocketOptions.StartTls;
 
-            await client.ConnectAsync(MailOptions.SmtpHost, MailOptions.SmtpPort, secureSocketOptions, cancellationToken);
+            await client.ConnectAsync(settings.Host, settings.Port, secureSocketOptions, cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(MailOptions.SmtpUser))
+            if (!string.IsNullOrWhiteSpace(settings.Login))
             {
-                await client.AuthenticateAsync(MailOptions.SmtpUser, MailOptions.SmtpPassword ?? string.Empty, cancellationToken);
+                await client.AuthenticateAsync(settings.Login, settings.Password ?? string.Empty, cancellationToken);
             }
 
             await client.SendAsync(message, cancellationToken);

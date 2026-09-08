@@ -1,5 +1,7 @@
 using DMCorp.Framework.Basics.DAL;
+using DMCorp.Framework.Basics.Email;
 using DMCorp.Framework.Basics.Security;
+using DMCorp.Framework.Basics.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
@@ -9,6 +11,7 @@ using MotoRodeo.DAL;
 using MotoRodeo.DAL.Context;
 using MotoRodeo.Web.Health;
 using MotoRodeo.Web.Services;
+using MotoRodeo.Web.Settings;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +47,13 @@ Environment.SetEnvironmentVariable("SmtpFrom", configuration.GetValue<string>("S
 Environment.SetEnvironmentVariable("SmtpFromName", configuration.GetValue<string>("SmtpFromName"));
 Environment.SetEnvironmentVariable("SmtpUseSsl", configuration.GetValue<string>("SmtpUseSsl"));
 
+Environment.SetEnvironmentVariable("EmailServiceSettings.OutAddress", configuration.GetValue<string>("SmtpFrom"));
+Environment.SetEnvironmentVariable("EmailServiceSettings.OutAddressDisplayName", configuration.GetValue<string>("SmtpFromName"));
+Environment.SetEnvironmentVariable("EmailServiceSettings.Host", configuration.GetValue<string>("SmtpHost"));
+Environment.SetEnvironmentVariable("EmailServiceSettings.Port", configuration.GetValue<string>("SmtpPort"));
+Environment.SetEnvironmentVariable("EmailServiceSettings.Login", configuration.GetValue<string>("SmtpUser"));
+Environment.SetEnvironmentVariable("EmailServiceSettings.Password", configuration.GetValue<string>("SmtpPassword"));
+
 Environment.SetEnvironmentVariable("EventParticipationApiKey", configuration.GetValue<string>("EventParticipationApiKey"));
 
 #endif
@@ -63,6 +73,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddMotoRodeoBl();
 builder.Services.AddScoped<IAdvancedSecurityService, SecurityService>();
+
+// Сервис отправки электронной почты
+builder.Services.AddScoped<IEmailServiceSettings, EmailServiceSettings>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>
