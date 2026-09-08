@@ -1,3 +1,5 @@
+using MotoRodeo.DAL.Enums;
+
 namespace MotoRodeo.BL.Dtos;
 
 /// <summary>
@@ -29,4 +31,9 @@ public sealed class EventListItemDto
     /// Дата закрытия регистрации.
     /// </summary>
     public DateTimeOffset RegistrationClosesAt { get; set; }
+
+    /// <summary>
+    /// Статус события.
+    /// </summary>
+    public EventStatusEnum Status { get; set; }
 }

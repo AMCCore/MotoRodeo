@@ -1,22 +1,22 @@
 namespace MotoRodeo.BL.Dtos;
 
 /// <summary>
-/// Список событий, разбитый на текущее, планируемые и прошедшие.
+/// Список событий, разбитый на проводимые, планируемые и прошедшие.
 /// </summary>
 public sealed class EventsListDto
 {
     /// <summary>
-    /// Ближайшее (текущее) событие, если есть.
+    /// Мероприятия в статусе «проводится» (Ready).
     /// </summary>
-    public EventListItemDto? Current { get; set; }
+    public IReadOnlyList<EventListItemDto> InProgress { get; set; } = [];
 
     /// <summary>
-    /// Планируемые события (кроме текущего).
+    /// Планируемые события.
     /// </summary>
     public IReadOnlyList<EventListItemDto> Upcoming { get; set; } = [];
 
     /// <summary>
-    /// Прошедшие события.
+    /// Прошедшие / завершённые события.
     /// </summary>
     public IReadOnlyList<EventListItemDto> Past { get; set; } = [];
 }

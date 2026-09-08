@@ -21,7 +21,7 @@ public class EventsController(
     IAdvancedSecurityService security) : Controller
 {
     /// <summary>
-    /// Список событий: текущее, планируемые, прошедшие.
+    /// Список событий: проводится, планируемые, прошедшие.
     /// </summary>
     [HttpGet]
     [Route("")]
@@ -41,7 +41,6 @@ public class EventsController(
         try
         {
             var details = await mediator.Send(new GetEventDetailsQuery(id), token);
-            ViewBag.CanManage = security.HasRight(AccountRightEnum.ManageEvents);
             return View(details);
         }
         catch (KeyNotFoundException ex)
@@ -97,6 +96,12 @@ public class EventsController(
         try
         {
             var details = await mediator.Send(new GetEventDetailsQuery(id), token);
+            if (!details.CanEditEvent)
+            {
+                TempData["Error"] = "Завершённое мероприятие нельзя изменять.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
             var exclude = details.Participants.Select(p => p.AccountId).ToList();
             var candidates = await mediator.Send(new GetJudgeCandidatesQuery(exclude), token);
 
@@ -248,6 +253,81 @@ public class EventsController(
         {
             await mediator.Send(new RejectParticipantCommand(eventId, accountId), token);
             TempData["Info"] = "Заявка отклонена.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return View("Forbidden");
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id = eventId });
+    }
+
+    /// <summary>
+    /// Начать мероприятие (планируемое → проводится).
+    /// </summary>
+    [HttpPost]
+    [Route("Start")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Start(Guid eventId, CancellationToken token)
+    {
+        try
+        {
+            await mediator.Send(new StartEventCommand(eventId), token);
+            TempData["Info"] = "Мероприятие начато.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return View("Forbidden");
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id = eventId });
+    }
+
+    /// <summary>
+    /// Завершить мероприятие.
+    /// </summary>
+    [HttpPost]
+    [Route("Complete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Complete(Guid eventId, CancellationToken token)
+    {
+        try
+        {
+            await mediator.Send(new CompleteEventCommand(eventId), token);
+            TempData["Info"] = "Мероприятие завершено.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return View("Forbidden");
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(Details), new { id = eventId });
+    }
+
+    /// <summary>
+    /// Отменить планируемое мероприятие.
+    /// </summary>
+    [HttpPost]
+    [Route("Cancel")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(Guid eventId, CancellationToken token)
+    {
+        try
+        {
+            await mediator.Send(new CancelEventCommand(eventId), token);
+            TempData["Info"] = "Мероприятие отменено.";
         }
         catch (UnauthorizedAccessException)
         {

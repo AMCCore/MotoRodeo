@@ -9,23 +9,23 @@ namespace MotoRodeo.DAL.Enums;
 public enum EventStatusEnum
 {
     /// <summary>
-    /// Событие опубликовано, регистрация может быть открыта.
+    /// Мероприятие запланировано, ещё не начато.
     /// </summary>
-    [Description("Опубликовано")]
+    [Description("Планируемое")]
     [EnumGuid("7E1D4C90-3A5B-4F82-B6C1-9D2E8A0F4C53")]
-    Published,
+    Planned,
 
     /// <summary>
-    /// Регистрация закрыта, сетка ещё не собрана.
-    /// </summary>
-    [Description("Регистрация закрыта")]
-    [EnumGuid("8F2E5D01-4B6C-4093-C7D2-0E3F9B1A5D64")]
-    RegistrationClosed,
-
-    /// <summary>
-    /// Группы и заезды сформированы.
+    /// Мероприятие начато / проводится (в дальнейшем — отдельный функционал сетки).
     /// </summary>
     [Description("Сетка готова")]
     [EnumGuid("9A3F6E12-5C7D-41A4-D8E3-1F4A0C2B6E75")]
-    Ready
+    Ready,
+
+    /// <summary>
+    /// Мероприятие завершено или отменено.
+    /// </summary>
+    [Description("Завершено")]
+    [EnumGuid("A4B5C6D7-8E9F-4012-B345-6789ABCDEF01")]
+    Completed
 }

@@ -104,7 +104,7 @@ public sealed class CreateEventCommandHandler(
             EventDate = request.EventDate,
             RegistrationClosesAt = request.RegistrationClosesAt,
             GroupCount = 1,
-            Status = EventStatusEnum.Published,
+            Status = EventStatusEnum.Planned,
             DateCreated = DateTimeOffset.UtcNow
         };
         unitOfWork.AddEntity(entity);

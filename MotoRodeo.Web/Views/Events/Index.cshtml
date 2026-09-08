@@ -4,15 +4,18 @@
 }
 <h1 class="h4 mb-3">События</h1>
 
-@if (Model.Current is null && Model.Upcoming.Count == 0 && Model.Past.Count == 0)
+@if (Model.InProgress.Count == 0 && Model.Upcoming.Count == 0 && Model.Past.Count == 0)
 {
     <div class="alert alert-secondary">Пока нет событий.</div>
 }
 
-@if (Model.Current is not null)
+@if (Model.InProgress.Count > 0)
 {
-    <h2 class="h5 mt-3">Текущее</h2>
-    <partial name="_EventListCard" model="Model.Current" />
+    <h2 class="h5 mt-3">Проводится</h2>
+    @foreach (var item in Model.InProgress)
+    {
+        <partial name="_EventListCard" model="item" />
+    }
 }
 
 @if (Model.Upcoming.Count > 0)

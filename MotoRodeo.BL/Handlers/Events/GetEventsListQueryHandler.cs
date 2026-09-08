@@ -7,6 +7,7 @@ using MotoRodeo.BL.Commands.Events;
 using MotoRodeo.BL.Dtos;
 using MotoRodeo.BL.Security;
 using MotoRodeo.DAL.Entities;
+using MotoRodeo.DAL.Enums;
 
 namespace MotoRodeo.BL.Handlers.Events;
 
@@ -25,28 +26,42 @@ public sealed class GetEventsListQueryHandler(
         logger.LogInformation("Загрузка списка событий.");
 
         var now = DateTimeOffset.UtcNow;
+        var autoCompleteBefore = now - EventLifecycleRules.AutoCompleteAfter;
+
         var items = await unitOfWork.Query<DBEvent>()
-            .OrderBy(x => x.EventDate)
             .Select(x => new EventListItemDto
             {
                 Id = x.Id,
                 Title = x.Title,
                 Place = x.Place,
                 EventDate = x.EventDate,
-                RegistrationClosesAt = x.RegistrationClosesAt
+                RegistrationClosesAt = x.RegistrationClosesAt,
+                Status = x.Status
             })
             .ToListAsync(cancellationToken);
 
-        var upcomingAll = items.Where(x => x.EventDate >= now).OrderBy(x => x.EventDate).ToList();
-        var past = items.Where(x => x.EventDate < now).OrderByDescending(x => x.EventDate).ToList();
-        var current = upcomingAll.FirstOrDefault();
-        var upcoming = current == null
-            ? upcomingAll
-            : upcomingAll.Where(x => x.Id != current.Id).ToList();
+        var inProgress = items
+            .Where(x => x.Status == EventStatusEnum.Ready && x.EventDate >= autoCompleteBefore)
+            .OrderBy(x => x.EventDate)
+            .ToList();
+
+        var upcoming = items
+            .Where(x => x.Status == EventStatusEnum.Planned && x.EventDate >= autoCompleteBefore)
+            .OrderBy(x => x.EventDate)
+            .ToList();
+
+        var past = items
+            .Where(x =>
+                x.Status == EventStatusEnum.Completed
+                || ((x.Status == EventStatusEnum.Planned || x.Status == EventStatusEnum.Ready)
+                    && x.EventDate < autoCompleteBefore))
+            .OrderByDescending(x => x.EventDate)
+            .Take(10)
+            .ToList();
 
         return new EventsListDto
         {
-            Current = current,
+            InProgress = inProgress,
             Upcoming = upcoming,
             Past = past
         };

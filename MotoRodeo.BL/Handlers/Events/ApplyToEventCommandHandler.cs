@@ -37,14 +37,10 @@ public sealed class ApplyToEventCommandHandler(
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
         var now = DateTimeOffset.UtcNow;
-        if (entity.EventDate < now)
+        if (!EventLifecycleRules.IsRegistrationOpen(entity, now))
         {
-            throw new InvalidOperationException("Нельзя подать заявку на прошедшее событие.");
-        }
-
-        if (now >= entity.RegistrationClosesAt)
-        {
-            throw new InvalidOperationException("Регистрация на событие закрыта.");
+            throw new InvalidOperationException(
+                "Нельзя подать заявку: регистрация закрыта или мероприятие не в статусе «планируемое».");
         }
 
         if (entity.Judges.Any(j => j.AccountId == accountId))

@@ -40,6 +40,12 @@ public sealed class RejectParticipantCommandHandler(
             throw new UnauthorizedAccessException("Недостаточно прав.");
         }
 
+        var eventEntity = await unitOfWork.Query<DBEvent>()
+            .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
+            ?? throw new KeyNotFoundException("Событие не найдено.");
+
+        EventLifecycleRules.EnsureEditable(eventEntity, DateTimeOffset.UtcNow);
+
         var participant = await unitOfWork.Query<DBEventParticipant>()
             .SingleOrDefaultAsync(
                 x => x.EventId == request.EventId && x.AccountId == request.AccountId,

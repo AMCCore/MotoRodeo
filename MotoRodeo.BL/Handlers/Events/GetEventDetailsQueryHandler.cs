@@ -32,17 +32,19 @@ public sealed class GetEventDetailsQueryHandler(
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
         var now = DateTimeOffset.UtcNow;
-        var registrationOpen = now < entity.RegistrationClosesAt && entity.EventDate >= now;
+        var registrationOpen = EventLifecycleRules.IsRegistrationOpen(entity, now);
+        var effectivelyCompleted = EventLifecycleRules.IsEffectivelyCompleted(entity, now);
         var canManage = security.HasRight(AccountRightEnum.ManageEvents);
         var currentAccountId = security.CurrentAccountId;
         var isJudge = entity.Judges.Any(j => j.AccountId == currentAccountId);
         var own = entity.Participants.FirstOrDefault(p => p.AccountId == currentAccountId);
-        var canModerate = canManage || isJudge;
+        var canViewParticipants = canManage || isJudge;
+        var canModerateActions = canViewParticipants && !effectivelyCompleted;
 
-        var participants = canModerate
+        var participants = canViewParticipants
             ? entity.Participants
                 .OrderBy(p => p.DateCreated)
-                .Select(p => MapParticipant(p, canManage, isJudge))
+                .Select(p => MapParticipant(p, canModerateActions && canManage, canModerateActions && isJudge))
                 .ToList()
             : [];
 
@@ -63,6 +65,7 @@ public sealed class GetEventDetailsQueryHandler(
             RegistrationClosesAt = entity.RegistrationClosesAt,
             GroupCount = entity.GroupCount,
             Status = entity.Status,
+            StatusDisplayLabel = EventLifecycleRules.GetDisplayStatusLabel(entity.Status, entity.EventDate, now),
             Judges = entity.Judges
                 .Select(j => new NamedAccountDto { Id = j.AccountId, Name = AccountDisplay.Format(j.Account) })
                 .OrderBy(j => j.Name)
@@ -71,7 +74,11 @@ public sealed class GetEventDetailsQueryHandler(
             CurrentUserParticipation = currentParticipation,
             CanApply = canApply,
             CurrentUserIsJudge = isJudge,
-            CanModerateParticipants = canModerate,
+            CanModerateParticipants = canViewParticipants,
+            CanStartEvent = EventLifecycleRules.CanStart(entity, canManage, isJudge, now),
+            CanCompleteEvent = EventLifecycleRules.CanComplete(entity, canManage, isJudge, now),
+            CanCancelEvent = EventLifecycleRules.CanCancel(entity, canManage, isJudge, now),
+            CanEditEvent = canManage && !effectivelyCompleted,
             RegistrationOpen = registrationOpen
         };
     }

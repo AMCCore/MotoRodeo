@@ -35,6 +35,8 @@ public sealed class UpdateEventCommandHandler(
             .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
+        EventLifecycleRules.EnsureEditable(entity, DateTimeOffset.UtcNow);
+
         var participantIds = entity.Participants.Select(p => p.AccountId).ToHashSet();
         var judgeIds = await EventJudgeRules.ValidateJudgesAsync(
             unitOfWork, request.JudgeAccountIds, participantIds, cancellationToken);

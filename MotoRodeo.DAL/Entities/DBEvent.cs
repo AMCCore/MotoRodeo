@@ -59,7 +59,7 @@ public class DBEvent : IEntityBase, IEntityWithDateCreated
     /// <summary>
     /// Статус события.
     /// </summary>
-    public EventStatusEnum Status { get; set; } = EventStatusEnum.Published;
+    public EventStatusEnum Status { get; set; } = EventStatusEnum.Planned;
 
     /// <summary>
     /// Набор участников события.

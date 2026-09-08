@@ -73,6 +73,31 @@ public sealed class EventDetailsDto
     public bool CanModerateParticipants { get; set; }
 
     /// <summary>
+    /// Подпись статуса для UI (с учётом правила «сутки после даты»).
+    /// </summary>
+    public string StatusDisplayLabel { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Можно ли начать мероприятие.
+    /// </summary>
+    public bool CanStartEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли завершить мероприятие.
+    /// </summary>
+    public bool CanCompleteEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли отменить планируемое мероприятие.
+    /// </summary>
+    public bool CanCancelEvent { get; set; }
+
+    /// <summary>
+    /// Можно ли редактировать карточку события.
+    /// </summary>
+    public bool CanEditEvent { get; set; }
+
+    /// <summary>
     /// Регистрация ещё открыта.
     /// </summary>
     public bool RegistrationOpen { get; set; }

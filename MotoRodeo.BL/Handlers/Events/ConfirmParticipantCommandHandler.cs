@@ -27,6 +27,12 @@ public sealed class ConfirmParticipantCommandHandler(
             "Подтверждение участника. EventId={EventId}, AccountId={AccountId}",
             request.EventId, request.AccountId);
 
+        var eventEntity = await unitOfWork.Query<DBEvent>()
+            .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
+            ?? throw new KeyNotFoundException("Событие не найдено.");
+
+        EventLifecycleRules.EnsureEditable(eventEntity, DateTimeOffset.UtcNow);
+
         var participant = await unitOfWork.Query<DBEventParticipant>()
             .SingleOrDefaultAsync(
                 x => x.EventId == request.EventId && x.AccountId == request.AccountId,
