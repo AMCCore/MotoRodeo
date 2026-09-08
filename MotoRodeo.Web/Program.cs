@@ -1,13 +1,15 @@
-using System.Globalization;
 using DMCorp.Framework.Basics.DAL;
 using DMCorp.Framework.Basics.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MotoRodeo.BL;
 using MotoRodeo.DAL;
 using MotoRodeo.DAL.Context;
+using MotoRodeo.Web.Health;
 using MotoRodeo.Web.Services;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +76,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         x.ExpireTimeSpan = TimeSpan.FromHours(12);
     });
 
+//health checks
+builder.Services.AddHealthChecks()
+    .AddCheck<SimpleHealthCheck>("simple_check", tags: ["Liveness"])
+    .AddCheck<SimpleDbCheck>("simple_db_check", tags: ["Readiness"])
+    .AddCheck<DbMigrationsHealthCheck>("simple_db_migration_check", tags: ["Readiness"])
+    .AddCheck<SMTPHealthChecks>("smtp_check", tags: ["Readiness"]);
+
 //---------------------------------------------
 var app = builder.Build();
 
@@ -96,5 +105,11 @@ app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("Liveness")
+});
+app.MapHealthChecks("/health/ready");
 
 app.Run();
