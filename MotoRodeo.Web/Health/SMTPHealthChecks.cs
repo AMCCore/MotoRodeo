@@ -11,7 +11,7 @@ public class SMTPHealthChecks(IEmailServiceSettings emailServiceSettings, ILogge
         {
             logger?.LogDebug("Checking SMTP...");
             using var smtp = new MailKit.Net.Smtp.SmtpClient();
-            await smtp.ConnectAsync(emailServiceSettings.Host, emailServiceSettings.Port, MailKit.Security.SecureSocketOptions.StartTlsWhenAvailable, cancellationToken);
+            await smtp.ConnectAsync(emailServiceSettings.Host, emailServiceSettings.Port, MailKit.Security.SecureSocketOptions.SslOnConnect, cancellationToken);
             if (!string.IsNullOrWhiteSpace(emailServiceSettings.Login) && !string.IsNullOrWhiteSpace(emailServiceSettings.Password))
             {
                 await smtp.AuthenticateAsync(emailServiceSettings.Login, emailServiceSettings.Password, cancellationToken);
