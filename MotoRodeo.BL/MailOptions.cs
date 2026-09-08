@@ -6,31 +6,6 @@ namespace MotoRodeo.BL;
 public static class MailOptions
 {
     /// <summary>
-    /// Хост SMTP-сервера.
-    /// </summary>
-    public static string SmtpHost => Environment.GetEnvironmentVariable(nameof(SmtpHost)) ?? throw new InvalidOperationException($"{nameof(SmtpHost)} is not set.");
-
-    /// <summary>
-    /// Порт SMTP-сервера.
-    /// </summary>
-    public static int SmtpPort => int.Parse(Environment.GetEnvironmentVariable(nameof(SmtpPort)) ?? "587");
-
-    /// <summary>
-    /// Логин SMTP (может быть пустым при анонимной отправке).
-    /// </summary>
-    public static string? SmtpUser => Environment.GetEnvironmentVariable(nameof(SmtpUser));
-
-    /// <summary>
-    /// Пароль SMTP.
-    /// </summary>
-    public static string? SmtpPassword => Environment.GetEnvironmentVariable(nameof(SmtpPassword));
-
-    /// <summary>
-    /// Адрес отправителя.
-    /// </summary>
-    public static string SmtpFrom => Environment.GetEnvironmentVariable(nameof(SmtpFrom)) ?? throw new InvalidOperationException($"{nameof(SmtpFrom)} is not set.");
-
-    /// <summary>
     /// Отображаемое имя отправителя.
     /// </summary>
     public static string SmtpFromName => Environment.GetEnvironmentVariable(nameof(SmtpFromName)) ?? "МотоРодео";

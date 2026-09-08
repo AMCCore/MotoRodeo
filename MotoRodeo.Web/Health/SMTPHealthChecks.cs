@@ -1,6 +1,5 @@
 ﻿using DMCorp.Framework.Basics.Settings;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using MotoRodeo.Web.Health;
 
 namespace MotoRodeo.Web.Health;
 
