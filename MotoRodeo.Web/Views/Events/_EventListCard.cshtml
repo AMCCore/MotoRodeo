@@ -7,8 +7,15 @@
         <p class="card-text mb-1 text-muted small">
             @AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM.yyyy HH:mm") · @Model.Place
         </p>
-        <p class="card-text mb-0 text-muted small">
+        <p class="card-text @(Model.CanViewParticipantCounts ? "mb-1" : "mb-0") text-muted small">
             Регистрация до @AppTimeZone.ToLocal(Model.RegistrationClosesAt).ToString("dd.MM.yyyy HH:mm")
+        </p>
+        <p class="card-text mb-0 text-muted small">
+            Участников: @Model.ConfirmedParticipantCount
+            @if (Model.CanViewParticipantCounts && Model.PendingApplicationCount > 0)
+            {
+                <text> · Заявок: @Model.PendingApplicationCount</text>
+            }
         </p>
     </div>
 </div>

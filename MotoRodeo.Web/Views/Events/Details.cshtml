@@ -3,11 +3,18 @@
     ViewData["Title"] = Model.Title;
     string StatusLabel(ParticipantStatusEnum s) => s switch
     {
-        ParticipantStatusEnum.Draft => "Новая",
-        ParticipantStatusEnum.Confirmed => "Подтверждён",
+        ParticipantStatusEnum.Draft => "Заявлен",
+        ParticipantStatusEnum.Confirmed => "Согласован",
         ParticipantStatusEnum.Rejected => "Отклонён",
         _ => s.ToString()
     };
+    var participantGroups = new (string Title, IReadOnlyList<EventParticipantDto> Items)[]
+    {
+        ("Заявленные", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Draft).ToList()),
+        ("Согласованные", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Confirmed).ToList()),
+        ("Отклонённые", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Rejected).ToList())
+    };
+    var cancelConfirmMessage = $"Вы уверены что хотите отменить мероприятие {Model.Title} ({AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM")})?";
 }
 <div class="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
     <h1 class="h4 mb-0">@Model.Title</h1>
@@ -51,8 +58,7 @@
         }
         @if (Model.CanCancelEvent)
         {
-            <form method="post" asp-action="Cancel"
-                  onsubmit="return confirm('Отменить мероприятие? Оно будет переведено в завершённые.');">
+            <form method="post" asp-action="Cancel" class="js-confirm-form" data-confirm-message="@cancelConfirmMessage">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="eventId" value="@Model.Id" />
                 <button type="submit" class="btn btn-outline-danger w-100 py-3">Отменить мероприятие</button>
@@ -141,41 +147,105 @@ else if (!Model.RegistrationOpen)
     }
     else
     {
-        <div class="list-group mb-3">
-            @foreach (var p in Model.Participants)
+        @foreach (var group in participantGroups)
+        {
+            if (group.Items.Count == 0)
             {
-                <div class="list-group-item">
-                    <div class="fw-semibold">@p.Name</div>
-                    <div class="small text-muted mb-2">
-                        Статус: @StatusLabel(p.Status) · Техника: @(p.UsesOwnEquipment ? "своя" : "аренда")
-                    </div>
-                    @if (p.CanConfirm || p.CanReject)
-                    {
-                        <div class="d-flex gap-2">
-                            @if (p.CanConfirm)
+                continue;
+            }
+            <h3 class="h6 text-muted mt-3 mb-2">@group.Title</h3>
+            <div class="list-group mb-3">
+                @foreach (var p in group.Items)
+                {
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div class="min-w-0">
+                                <div class="fw-semibold">@p.Name</div>
+                                <div class="small text-muted">
+                                    Статус: @StatusLabel(p.Status) · Техника: @(p.UsesOwnEquipment ? "своя" : "аренда")
+                                </div>
+                            </div>
+                            @if (p.CanConfirm || p.CanReject)
                             {
-                                <form method="post" asp-action="Confirm" class="flex-fill">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="eventId" value="@Model.Id" />
-                                    <input type="hidden" name="accountId" value="@p.AccountId" />
-                                    <button type="submit" class="btn btn-success w-100 py-2">Подтвердить</button>
-                                </form>
-                            }
-                            @if (p.CanReject)
-                            {
-                                <form method="post" asp-action="Reject" class="flex-fill">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="eventId" value="@Model.Id" />
-                                    <input type="hidden" name="accountId" value="@p.AccountId" />
-                                    <button type="submit" class="btn btn-outline-danger w-100 py-2">Отклонить</button>
-                                </form>
+                                <div class="d-flex gap-1 flex-shrink-0">
+                                    @if (p.CanConfirm)
+                                    {
+                                        <form method="post" asp-action="Confirm">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="eventId" value="@Model.Id" />
+                                            <input type="hidden" name="accountId" value="@p.AccountId" />
+                                            <button type="submit" class="btn btn-success btn-sm btn-compact">Подтвердить</button>
+                                        </form>
+                                    }
+                                    @if (p.CanReject)
+                                    {
+                                        <form method="post" asp-action="Reject" class="js-confirm-form"
+                                              data-confirm-message="Вы уверены что хотите отклонить заявку пользователя @p.Name ?">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="eventId" value="@Model.Id" />
+                                            <input type="hidden" name="accountId" value="@p.AccountId" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm btn-compact">Отклонить</button>
+                                        </form>
+                                    }
+                                </div>
                             }
                         </div>
-                    }
-                </div>
-            }
-        </div>
+                    </div>
+                }
+            </div>
+        }
     }
 }
 
 <a class="btn btn-outline-secondary w-100 py-3" asp-action="Index">К списку событий</a>
+
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-labelledby="confirmActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmActionModalLabel">Подтверждение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body" id="confirmActionModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmActionModalSubmit">Да</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        var pendingForm = null;
+        var modalEl = document.getElementById('confirmActionModal');
+        if (!modalEl) return;
+
+        var modalBody = document.getElementById('confirmActionModalBody');
+        var submitBtn = document.getElementById('confirmActionModalSubmit');
+        var modal = new bootstrap.Modal(modalEl);
+
+        document.querySelectorAll('form.js-confirm-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                pendingForm = form;
+                modalBody.textContent = form.getAttribute('data-confirm-message') || 'Подтвердите действие.';
+                modal.show();
+            });
+        });
+
+        submitBtn.addEventListener('click', function () {
+            if (!pendingForm) return;
+            var form = pendingForm;
+            pendingForm = null;
+            modal.hide();
+            HTMLFormElement.prototype.submit.call(form);
+        });
+
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            pendingForm = null;
+        });
+    })();
+</script>
+}
