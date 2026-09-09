@@ -36,4 +36,19 @@ public sealed class EventListItemDto
     /// Статус события.
     /// </summary>
     public EventStatusEnum Status { get; set; }
+
+    /// <summary>
+    /// Количество подтверждённых участников.
+    /// </summary>
+    public int ConfirmedParticipantCount { get; set; }
+
+    /// <summary>
+    /// Количество неподтверждённых (новых) заявок.
+    /// </summary>
+    public int PendingApplicationCount { get; set; }
+
+    /// <summary>
+    /// Может ли текущий пользователь видеть счётчики заявок (админ или судья события).
+    /// </summary>
+    public bool CanViewParticipantCounts { get; set; }
 }

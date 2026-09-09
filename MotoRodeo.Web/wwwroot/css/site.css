@@ -12,6 +12,13 @@ body {
     justify-content: center;
 }
 
+.btn-compact {
+    min-height: 32px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8125rem;
+    line-height: 1.2;
+}
+
 .form-check {
     padding: 0.5rem 0 0.5rem 1.75rem;
 }
