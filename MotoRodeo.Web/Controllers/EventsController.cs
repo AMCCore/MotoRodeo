@@ -1,4 +1,5 @@
 using System.Text;
+using DMCorp.Framework.Basics.Extensions;
 using DMCorp.Framework.Basics.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -139,7 +140,8 @@ public class EventsController(
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Route("Edit")]
-    public async Task<IActionResult> Edit(EventEditForm form, CancellationToken token)
+    [Route("Edit/{id:guid}")]
+    public async Task<IActionResult> Save(EventEditForm form, CancellationToken token)
     {
         if (!security.HasRight(AccountRightEnum.ManageEvents))
         {
@@ -151,7 +153,7 @@ public class EventsController(
 
         if (!ModelState.IsValid)
         {
-            return View(form);
+            return View("Edit", form);
         }
 
         try
@@ -159,7 +161,7 @@ public class EventsController(
             var eventDate = AppTimeZone.ToUtc(form.EventDateLocal);
             var closesAt = AppTimeZone.ToUtcEndOfDay(form.RegistrationClosesAtLocal);
 
-            if (form.Id is null)
+            if (form.Id.IsNullOrEmpty())
             {
                 var id = await mediator.Send(new CreateEventCommand(
                     form.Title,
@@ -172,7 +174,7 @@ public class EventsController(
             }
 
             await mediator.Send(new UpdateEventCommand(
-                form.Id.Value,
+                form.Id!.Value,
                 form.Title,
                 form.Place,
                 eventDate,
@@ -188,7 +190,7 @@ public class EventsController(
         catch (Exception ex) when (ex is InvalidOperationException or KeyNotFoundException)
         {
             form.Error = ex.Message;
-            return View(form);
+            return View("Edit", form);
         }
     }
 
