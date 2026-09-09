@@ -7,6 +7,7 @@ using MotoRodeo.BL;
 using MotoRodeo.BL.Commands.Events;
 using MotoRodeo.BL.Dtos;
 using MotoRodeo.DAL.Enums;
+using MotoRodeo.Web.Infrastructure;
 using MotoRodeo.Web.Models;
 
 namespace MotoRodeo.Web.Controllers;
@@ -155,8 +156,8 @@ public class EventsController(
 
         try
         {
-            var eventDate = ToUtcOffset(form.EventDateLocal);
-            var closesAt = ToUtcOffsetEndOfDay(form.RegistrationClosesAtLocal);
+            var eventDate = AppTimeZone.ToUtc(form.EventDateLocal);
+            var closesAt = AppTimeZone.ToUtcEndOfDay(form.RegistrationClosesAtLocal);
 
             if (form.Id is null)
             {
@@ -378,7 +379,7 @@ public class EventsController(
     {
         var sb = new StringBuilder();
         sb.AppendLine(CsvCell(export.Title));
-        sb.AppendLine(CsvCell(export.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")));
+        sb.AppendLine(CsvCell(AppTimeZone.ToLocal(export.EventDate).ToString("dd.MM.yyyy HH:mm")));
         sb.AppendLine();
         sb.AppendLine(string.Join(';', "№", "Фамилия Имя (Прозвище)", "Мотоцикл"));
 
@@ -410,7 +411,7 @@ public class EventsController(
 
     private static string BuildExportFileName(ConfirmedParticipantsExportDto export)
     {
-        var date = export.EventDate.ToLocalTime().ToString("yyyy-MM-dd");
+        var date = AppTimeZone.ToLocal(export.EventDate).ToString("yyyy-MM-dd");
         var title = string.Join("_", export.Title.Split(
             Path.GetInvalidFileNameChars(),
             StringSplitOptions.RemoveEmptyEntries)).Trim();
@@ -451,14 +452,5 @@ public class EventsController(
     }
 
     private static DateTime ToLocalInput(DateTimeOffset value) =>
-        DateTime.SpecifyKind(value.ToLocalTime().DateTime, DateTimeKind.Unspecified);
-
-    private static DateTimeOffset ToUtcOffset(DateTime localUnspecified) =>
-        new DateTimeOffset(DateTime.SpecifyKind(localUnspecified, DateTimeKind.Local)).ToUniversalTime();
-
-    /// <summary>
-    /// Закрытие регистрации — выбранный день включительно (до конца суток).
-    /// </summary>
-    private static DateTimeOffset ToUtcOffsetEndOfDay(DateTime localDate) =>
-        ToUtcOffset(localDate.Date.AddDays(1).AddTicks(-1));
+        AppTimeZone.ToLocal(value);
 }

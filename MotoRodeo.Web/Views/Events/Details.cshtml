@@ -23,8 +23,8 @@
     <div class="card-body">
         <p class="mb-1"><strong>Статус:</strong> @Model.StatusDisplayLabel</p>
         <p class="mb-1"><strong>Место:</strong> @Model.Place</p>
-        <p class="mb-1"><strong>Дата:</strong> @Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
-        <p class="mb-0"><strong>Регистрация до:</strong> @Model.RegistrationClosesAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+        <p class="mb-1"><strong>Дата:</strong> @AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM.yyyy HH:mm")</p>
+        <p class="mb-0"><strong>Регистрация до:</strong> @AppTimeZone.ToLocal(Model.RegistrationClosesAt).ToString("dd.MM.yyyy HH:mm")</p>
     </div>
 </div>
 
