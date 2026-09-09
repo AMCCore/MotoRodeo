@@ -55,6 +55,15 @@ public sealed class RegisterForm
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
+    /// Подтверждение пароля.
+    /// </summary>
+    [Required]
+    [DataType(DataType.Password)]
+    [Display(Name = "Подтверждение пароля")]
+    [Compare(nameof(Password), ErrorMessage = "Пароли не совпадают.")]
+    public string ConfirmPassword { get; set; } = string.Empty;
+
+    /// <summary>
     /// Сообщение об ошибке регистрации для отображения на форме.
     /// </summary>
     public string? Error { get; set; }

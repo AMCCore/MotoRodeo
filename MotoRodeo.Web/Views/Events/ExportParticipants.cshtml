@@ -59,7 +59,7 @@
 </head>
 <body>
     <h1>@Model.Title</h1>
-    <p class="event-date">@Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+    <p class="event-date">@AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM.yyyy HH:mm")</p>
 
     @if (Model.Rows.Count == 0)
     {

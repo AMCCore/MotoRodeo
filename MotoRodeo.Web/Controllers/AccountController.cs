@@ -131,6 +131,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
             logger.LogWarning(ex, "Ошибка регистрации. Email={Email}", form.Email);
             form.Error = ex.Message;
             form.Password = string.Empty;
+            form.ConfirmPassword = string.Empty;
             return View(form);
         }
     }
