@@ -134,6 +134,6 @@ app.MapHealthChecks("/health/startup", new HealthCheckOptions
     Predicate = r => r.Tags.Contains("Startup")
 });
 
-Console.WriteLine($"Release: {gitVersion}");
+//Console.WriteLine($"Release: {gitVersion}");
 
 app.Run();

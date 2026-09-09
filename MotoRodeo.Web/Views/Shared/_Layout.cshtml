@@ -13,7 +13,16 @@
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-controller="Events" asp-action="Index">МотоРодео</a>
+            <div class="d-flex align-items-baseline gap-2">
+                <a class="navbar-brand mb-0" asp-controller="Events" asp-action="Index">МотоРодео</a>
+                @{
+                    var appVersion = Environment.GetEnvironmentVariable("AppVersion");
+                }
+                @if (!string.IsNullOrEmpty(appVersion))
+                {
+                    <span class="navbar-app-version">Сборка: @appVersion</span>
+                }
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu" aria-label="Меню">
                 <span class="navbar-toggler-icon"></span>
             </button>

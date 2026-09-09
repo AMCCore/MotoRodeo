@@ -2,6 +2,12 @@ body {
     min-height: 100vh;
 }
 
+.navbar-app-version {
+    font-size: 0.7rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.55);
+}
+
 .btn, .form-control {
     min-height: 44px;
 }
