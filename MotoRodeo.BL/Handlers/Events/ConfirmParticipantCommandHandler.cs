@@ -23,19 +23,20 @@ public sealed class ConfirmParticipantCommandHandler(
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
 
+        var dto = request.Dto;
         logger.LogInformation(
             "Подтверждение участника. EventId={EventId}, AccountId={AccountId}",
-            request.EventId, request.AccountId);
+            dto.EventId, dto.AccountId);
 
         var eventEntity = await unitOfWork.Query<DBEvent>()
-            .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
+            .SingleOrDefaultAsync(x => x.Id == dto.EventId, cancellationToken)
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
         EventLifecycleRules.EnsureEditable(eventEntity, DateTimeOffset.UtcNow);
 
         var participant = await unitOfWork.Query<DBEventParticipant>()
             .SingleOrDefaultAsync(
-                x => x.EventId == request.EventId && x.AccountId == request.AccountId,
+                x => x.EventId == dto.EventId && x.AccountId == dto.AccountId,
                 cancellationToken)
             ?? throw new KeyNotFoundException("Заявка на участие не найдена.");
 
@@ -50,6 +51,6 @@ public sealed class ConfirmParticipantCommandHandler(
 
         logger.LogInformation(
             "Участник подтверждён. EventId={EventId}, AccountId={AccountId}",
-            request.EventId, request.AccountId);
+            dto.EventId, dto.AccountId);
     }
 }

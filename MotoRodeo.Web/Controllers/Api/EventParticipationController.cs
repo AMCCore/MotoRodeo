@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoRodeo.BL.Commands.Events;
+using MotoRodeo.BL.Dtos;
 using MotoRodeo.Web.Filters;
 
 namespace MotoRodeo.Web.Controllers.Api;
@@ -23,7 +24,11 @@ public sealed class EventParticipationController(IMediator mediator, ILogger<Eve
     {
         try
         {
-            await mediator.Send(new ConfirmParticipantCommand(eventId, accountId), token);
+            await mediator.Send(new ConfirmParticipantCommand(new ConfirmParticipantDto
+            {
+                EventId = eventId,
+                AccountId = accountId
+            }), token);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -46,7 +51,11 @@ public sealed class EventParticipationController(IMediator mediator, ILogger<Eve
     {
         try
         {
-            await mediator.Send(new RejectParticipantCommand(eventId, accountId), token);
+            await mediator.Send(new RejectParticipantCommand(new RejectParticipantDto
+            {
+                EventId = eventId,
+                AccountId = accountId
+            }), token);
             return NoContent();
         }
         catch (KeyNotFoundException ex)

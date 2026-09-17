@@ -25,7 +25,8 @@ public sealed class RequestPasswordResetCommandHandler(
     /// <param name="cancellationToken">Токен отмены.</param>
     public async Task Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var dto = request.Dto;
+        var email = dto.Email.Trim().ToLowerInvariant();
         logger.LogInformation("Начало запроса восстановления пароля. Email={Email}", email);
 
         if (string.IsNullOrWhiteSpace(email))
@@ -55,7 +56,7 @@ public sealed class RequestPasswordResetCommandHandler(
         unitOfWork.AddEntity(resetRequest);
         await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
-        var link = request.ResetLinkFactory(resetRequest.Id);
+        var link = dto.ResetLinkFactory(resetRequest.Id);
         var body = MailOptions.EmailTemplatePasswordReset.Replace("{link}", link, StringComparison.Ordinal);
         await emailSender.SendAsync(accountLogin.Login, MailOptions.EmailSubjectPasswordReset, body, cancellationToken);
 

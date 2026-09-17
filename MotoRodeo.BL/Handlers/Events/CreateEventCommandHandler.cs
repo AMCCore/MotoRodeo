@@ -87,22 +87,23 @@ public sealed class CreateEventCommandHandler(
     public async Task<Guid> Handle(CreateEventCommand request, CancellationToken cancellationToken)
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
+        var dto = request.Dto;
         EventJudgeRules.ValidateEventFields(
-            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt);
+            dto.Title, dto.Place, dto.EventDate, dto.RegistrationClosesAt);
 
         var judgeIds = await EventJudgeRules.ValidateJudgesAsync(
-            unitOfWork, request.JudgeAccountIds, [], cancellationToken);
+            unitOfWork, dto.JudgeAccountIds, [], cancellationToken);
 
-        logger.LogInformation("Создание события. Title={Title}", request.Title);
+        logger.LogInformation("Создание события. Title={Title}", dto.Title);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
 
         var entity = new DBEvent
         {
-            Title = request.Title.Trim(),
-            Place = request.Place.Trim(),
-            EventDate = request.EventDate,
-            RegistrationClosesAt = request.RegistrationClosesAt,
+            Title = dto.Title.Trim(),
+            Place = dto.Place.Trim(),
+            EventDate = dto.EventDate,
+            RegistrationClosesAt = dto.RegistrationClosesAt,
             GroupCount = 1,
             Status = EventStatusEnum.Planned,
             DateCreated = DateTimeOffset.UtcNow

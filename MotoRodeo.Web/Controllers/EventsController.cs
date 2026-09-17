@@ -160,23 +160,27 @@ public class EventsController(
 
             if (form.Id is null)
             {
-                var id = await mediator.Send(new CreateEventCommand(
-                    form.Title,
-                    form.Place,
-                    eventDate,
-                    closesAt,
-                    form.JudgeAccountIds), token);
+                var id = await mediator.Send(new CreateEventCommand(new CreateEventDto
+                {
+                    Title = form.Title,
+                    Place = form.Place,
+                    EventDate = eventDate,
+                    RegistrationClosesAt = closesAt,
+                    JudgeAccountIds = form.JudgeAccountIds
+                }), token);
                 TempData["Info"] = "Событие создано.";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            await mediator.Send(new UpdateEventCommand(
-                form.Id.Value,
-                form.Title,
-                form.Place,
-                eventDate,
-                closesAt,
-                form.JudgeAccountIds), token);
+            await mediator.Send(new UpdateEventCommand(new UpdateEventDto
+            {
+                EventId = form.Id.Value,
+                Title = form.Title,
+                Place = form.Place,
+                EventDate = eventDate,
+                RegistrationClosesAt = closesAt,
+                JudgeAccountIds = form.JudgeAccountIds
+            }), token);
             TempData["Info"] = "Событие сохранено.";
             return RedirectToAction(nameof(Details), new { id = form.Id });
         }
@@ -201,7 +205,11 @@ public class EventsController(
     {
         try
         {
-            await mediator.Send(new ApplyToEventCommand(form.EventId, form.UsesOwnEquipment), token);
+            await mediator.Send(new ApplyToEventCommand(new ApplyToEventDto
+            {
+                EventId = form.EventId,
+                UsesOwnEquipment = form.UsesOwnEquipment
+            }), token);
             TempData["Info"] = "Заявка подана. Ожидайте подтверждения.";
         }
         catch (UnauthorizedAccessException)
@@ -226,7 +234,11 @@ public class EventsController(
     {
         try
         {
-            await mediator.Send(new ConfirmParticipantCommand(eventId, accountId), token);
+            await mediator.Send(new ConfirmParticipantCommand(new ConfirmParticipantDto
+            {
+                EventId = eventId,
+                AccountId = accountId
+            }), token);
             TempData["Info"] = "Участие подтверждено.";
         }
         catch (UnauthorizedAccessException)
@@ -251,7 +263,11 @@ public class EventsController(
     {
         try
         {
-            await mediator.Send(new RejectParticipantCommand(eventId, accountId), token);
+            await mediator.Send(new RejectParticipantCommand(new RejectParticipantDto
+            {
+                EventId = eventId,
+                AccountId = accountId
+            }), token);
             TempData["Info"] = "Заявка отклонена.";
         }
         catch (UnauthorizedAccessException)

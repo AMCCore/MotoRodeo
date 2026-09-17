@@ -25,14 +25,15 @@ public sealed class RegisterUserCommandHandler(
     /// <param name="cancellationToken">Токен отмены.</param>
     public async Task Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request.Email);
+        var dto = request.Dto;
+        ArgumentNullException.ThrowIfNull(dto.Email);
 
-        var firstName = request.FirstName.Trim();
-        var lastName = request.LastName.Trim();
-        var email = request.Email.Trim().ToLowerInvariant();
-        var nickname = request.Nickname?.Trim();
-        var vehicle = string.IsNullOrWhiteSpace(request.Vehicle) ? null : request.Vehicle.Trim();
-        var phoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+        var firstName = dto.FirstName.Trim();
+        var lastName = dto.LastName.Trim();
+        var email = dto.Email.Trim().ToLowerInvariant();
+        var nickname = dto.Nickname?.Trim();
+        var vehicle = string.IsNullOrWhiteSpace(dto.Vehicle) ? null : dto.Vehicle.Trim();
+        var phoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim();
 
         logger.LogInformation("Начало регистрации пользователя. Email={Email}", email);
 
@@ -58,7 +59,7 @@ public sealed class RegisterUserCommandHandler(
         {
             AccountId = account.Id,
             Login = email,
-            Password = BCrypt.Net.BCrypt.HashPassword(request.Password, 11),
+            Password = BCrypt.Net.BCrypt.HashPassword(dto.Password, 11),
             AccountLoginType = AccountLoginTypeEnum.Login
         });
 
@@ -69,7 +70,7 @@ public sealed class RegisterUserCommandHandler(
         await emailSender.SendAsync(
             email,
             MailOptions.EmailSubjectRegistration,
-            MailOptions.EmailTemplateRegistration.Replace("{link}", request.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
+            MailOptions.EmailTemplateRegistration.Replace("{link}", dto.ConfirmationLinkFactory(account.Id), StringComparison.Ordinal),
             cancellationToken);
 
 #endif

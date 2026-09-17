@@ -22,29 +22,30 @@ public sealed class UpdateEventCommandHandler(
     public async Task Handle(UpdateEventCommand request, CancellationToken cancellationToken)
     {
         Access.RequireRight(security, AccountRightEnum.ManageEvents);
+        var dto = request.Dto;
         EventJudgeRules.ValidateEventFields(
-            request.Title, request.Place, request.EventDate, request.RegistrationClosesAt);
+            dto.Title, dto.Place, dto.EventDate, dto.RegistrationClosesAt);
 
-        logger.LogInformation("Редактирование события. EventId={EventId}", request.EventId);
+        logger.LogInformation("Редактирование события. EventId={EventId}", dto.EventId);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
 
         var entity = await unitOfWork.Query<DBEvent>()
             .Include(x => x.Judges)
             .Include(x => x.Participants)
-            .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
+            .SingleOrDefaultAsync(x => x.Id == dto.EventId, cancellationToken)
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
         EventLifecycleRules.EnsureEditable(entity, DateTimeOffset.UtcNow);
 
         var participantIds = entity.Participants.Select(p => p.AccountId).ToHashSet();
         var judgeIds = await EventJudgeRules.ValidateJudgesAsync(
-            unitOfWork, request.JudgeAccountIds, participantIds, cancellationToken);
+            unitOfWork, dto.JudgeAccountIds, participantIds, cancellationToken);
 
-        entity.Title = request.Title.Trim();
-        entity.Place = request.Place.Trim();
-        entity.EventDate = request.EventDate;
-        entity.RegistrationClosesAt = request.RegistrationClosesAt;
+        entity.Title = dto.Title.Trim();
+        entity.Place = dto.Place.Trim();
+        entity.EventDate = dto.EventDate;
+        entity.RegistrationClosesAt = dto.RegistrationClosesAt;
 
         await unitOfWork.SaveChangesAsync(token: cancellationToken);
 

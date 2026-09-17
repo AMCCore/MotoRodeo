@@ -108,19 +108,21 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
 
         try
         {
-            await mediator.Send(new RegisterUserCommand(
-                form.FirstName,
-                form.LastName,
-                form.Nickname,
-                form.Email,
-                form.Password,
-                form.Vehicle,
-                form.PhoneNumber,
-                id => Url.Action(
+            await mediator.Send(new RegisterUserCommand(new RegisterUserDto
+            {
+                FirstName = form.FirstName,
+                LastName = form.LastName,
+                Nickname = form.Nickname,
+                Email = form.Email,
+                Password = form.Password,
+                Vehicle = form.Vehicle,
+                PhoneNumber = form.PhoneNumber,
+                ConfirmationLinkFactory = id => Url.Action(
                     nameof(ConfirmRegistration),
                     "Account",
                     new { AccountId = id },
-                    Request.Scheme)!), token);
+                    Request.Scheme)!
+            }), token);
 
             return View(new RegisterForm
             {
@@ -197,7 +199,11 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
             return View(form);
         }
 
-        await mediator.Send(new RequestPasswordResetCommand(form.Email, id => Url.Action("ConfirmPasswordReset", "Accounts", new { id }, Request.Scheme)!), token);
+        await mediator.Send(new RequestPasswordResetCommand(new RequestPasswordResetDto
+        {
+            Email = form.Email,
+            ResetLinkFactory = id => Url.Action("ConfirmPasswordReset", "Accounts", new { id }, Request.Scheme)!
+        }), token);
         form.Info = "Cсылка для восстановления пароля отправлена на указанный email.";
         return View(form);
     }
@@ -247,12 +253,14 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
 
         try
         {
-            await mediator.Send(new UpdateMyProfileCommand(
-                form.FirstName,
-                form.LastName,
-                form.Nickname,
-                form.Vehicle,
-                form.PhoneNumber), token);
+            await mediator.Send(new UpdateMyProfileCommand(new UpdateMyProfileDto
+            {
+                FirstName = form.FirstName,
+                LastName = form.LastName,
+                Nickname = form.Nickname,
+                Vehicle = form.Vehicle,
+                PhoneNumber = form.PhoneNumber
+            }), token);
 
             form.Info = "Профиль сохранён.";
             return View(form);
@@ -290,7 +298,11 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
 
         try
         {
-            await mediator.Send(new ChangePasswordCommand(form.CurrentPassword, form.NewPassword), token);
+            await mediator.Send(new ChangePasswordCommand(new ChangePasswordDto
+            {
+                CurrentPassword = form.CurrentPassword,
+                NewPassword = form.NewPassword
+            }), token);
             form = new ChangePasswordForm { Info = "Пароль изменён." };
             return View(form);
         }

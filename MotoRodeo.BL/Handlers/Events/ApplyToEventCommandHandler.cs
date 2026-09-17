@@ -23,17 +23,18 @@ public sealed class ApplyToEventCommandHandler(
     {
         Access.RequireAuthenticated(security);
 
+        var dto = request.Dto;
         var accountId = security.CurrentAccountId;
         logger.LogInformation(
             "Подача заявки на событие. EventId={EventId}, AccountId={AccountId}",
-            request.EventId, accountId);
+            dto.EventId, accountId);
 
         await unitOfWork.BeginTransactionAsync(cancellationToken);
 
         var entity = await unitOfWork.Query<DBEvent>()
             .Include(x => x.Judges)
             .Include(x => x.Participants)
-            .SingleOrDefaultAsync(x => x.Id == request.EventId, cancellationToken)
+            .SingleOrDefaultAsync(x => x.Id == dto.EventId, cancellationToken)
             ?? throw new KeyNotFoundException("Событие не найдено.");
 
         var now = DateTimeOffset.UtcNow;
@@ -58,13 +59,13 @@ public sealed class ApplyToEventCommandHandler(
             EventId = entity.Id,
             AccountId = accountId,
             Status = ParticipantStatusEnum.Draft,
-            UsesOwnEquipment = request.UsesOwnEquipment,
+            UsesOwnEquipment = dto.UsesOwnEquipment,
             DateCreated = DateTimeOffset.UtcNow
         });
 
         await unitOfWork.CommitAsync(cancellationToken);
         logger.LogInformation(
             "Заявка создана. EventId={EventId}, AccountId={AccountId}",
-            request.EventId, accountId);
+            dto.EventId, accountId);
     }
 }

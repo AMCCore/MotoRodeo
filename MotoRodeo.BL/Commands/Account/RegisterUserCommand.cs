@@ -1,24 +1,10 @@
 using MediatR;
+using MotoRodeo.BL.Dtos;
 
 namespace MotoRodeo.BL.Commands.Account;
 
 /// <summary>
 /// Команда регистрации нового пользователя с подтверждением по электронной почте.
 /// </summary>
-/// <param name="FirstName">Имя.</param>
-/// <param name="LastName">Фамилия.</param>
-/// <param name="Nickname">Обращение/прозвище.</param>
-/// <param name="Email">Электронная почта (логин).</param>
-/// <param name="Password">Пароль в открытом виде.</param>
-/// <param name="Vehicle">Транспортное средство.</param>
-/// <param name="PhoneNumber">Номер телефона.</param>
-/// <param name="ConfirmationLinkFactory">Фабрика абсолютной ссылки подтверждения по Id учётной записи.</param>
-public sealed record RegisterUserCommand(
-    string FirstName,
-    string LastName,
-    string? Nickname,
-    string Email,
-    string Password,
-    string? Vehicle,
-    string? PhoneNumber,
-    Func<Guid, string> ConfirmationLinkFactory) : IRequest;
+/// <param name="Dto">Данные регистрации.</param>
+public sealed record RegisterUserCommand(RegisterUserDto Dto) : IRequest;

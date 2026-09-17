@@ -24,7 +24,8 @@ public sealed class ChangePasswordCommandHandler(
     {
         Access.RequireAuthenticated(security);
 
-        if (string.IsNullOrWhiteSpace(request.NewPassword))
+        var dto = request.Dto;
+        if (string.IsNullOrWhiteSpace(dto.NewPassword))
         {
             throw new InvalidOperationException("Новый пароль не может быть пустым.");
         }
@@ -38,12 +39,12 @@ public sealed class ChangePasswordCommandHandler(
                 cancellationToken)
             ?? throw new KeyNotFoundException("Учётная запись не найдена.");
 
-        if (accountLogin.Password is null || !BCrypt.Net.BCrypt.Verify(request.CurrentPassword, accountLogin.Password))
+        if (accountLogin.Password is null || !BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, accountLogin.Password))
         {
             throw new InvalidOperationException("Неверный текущий пароль.");
         }
 
-        accountLogin.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, 11);
+        accountLogin.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword, 11);
         await unitOfWork.SaveChangesAsync(token: cancellationToken);
 
         logger.LogInformation("Пароль изменён. AccountId={AccountId}", security.CurrentAccountId);

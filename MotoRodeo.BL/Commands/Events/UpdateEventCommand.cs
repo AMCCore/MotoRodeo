@@ -1,20 +1,10 @@
 using MediatR;
+using MotoRodeo.BL.Dtos;
 
 namespace MotoRodeo.BL.Commands.Events;
 
 /// <summary>
 /// Редактирование события.
 /// </summary>
-/// <param name="EventId">Идентификатор события.</param>
-/// <param name="Title">Название.</param>
-/// <param name="Place">Место.</param>
-/// <param name="EventDate">Дата проведения.</param>
-/// <param name="RegistrationClosesAt">Закрытие регистрации.</param>
-/// <param name="JudgeAccountIds">Идентификаторы судей.</param>
-public sealed record UpdateEventCommand(
-    Guid EventId,
-    string Title,
-    string Place,
-    DateTimeOffset EventDate,
-    DateTimeOffset RegistrationClosesAt,
-    IReadOnlyList<Guid> JudgeAccountIds) : IRequest;
+/// <param name="Dto">Данные события.</param>
+public sealed record UpdateEventCommand(UpdateEventDto Dto) : IRequest;

@@ -23,11 +23,12 @@ public sealed class UpdateMyProfileCommandHandler(
     {
         Access.RequireAuthenticated(security);
 
-        var firstName = request.FirstName.Trim();
-        var lastName = request.LastName.Trim();
-        var nickname = string.IsNullOrWhiteSpace(request.Nickname) ? null : request.Nickname.Trim();
-        var vehicle = string.IsNullOrWhiteSpace(request.Vehicle) ? null : request.Vehicle.Trim();
-        var phoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+        var dto = request.Dto;
+        var firstName = dto.FirstName.Trim();
+        var lastName = dto.LastName.Trim();
+        var nickname = string.IsNullOrWhiteSpace(dto.Nickname) ? null : dto.Nickname.Trim();
+        var vehicle = string.IsNullOrWhiteSpace(dto.Vehicle) ? null : dto.Vehicle.Trim();
+        var phoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim();
 
         logger.LogInformation("Обновление профиля. AccountId={AccountId}", security.CurrentAccountId);
 
