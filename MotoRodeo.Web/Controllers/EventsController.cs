@@ -380,14 +380,15 @@ public class EventsController(
         sb.AppendLine(CsvCell(export.Title));
         sb.AppendLine(CsvCell(export.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")));
         sb.AppendLine();
-        sb.AppendLine(string.Join(';', "№", "Фамилия Имя (Прозвище)", "Мотоцикл"));
+        sb.AppendLine(string.Join(';', "№", "Фамилия Имя (Прозвище)", "Мотоцикл", "Телефон"));
 
         foreach (var row in export.Rows)
         {
             sb.AppendLine(string.Join(';',
                 CsvCell(row.RowNumber.ToString()),
                 CsvCell(row.DisplayName),
-                CsvCell(row.Motorcycle)));
+                CsvCell(row.Motorcycle),
+                CsvCell(row.PhoneNumber)));
         }
 
         var preamble = Encoding.UTF8.GetPreamble();

@@ -37,6 +37,11 @@
         <label asp-for="Vehicle" class="form-label"></label>
         <input asp-for="Vehicle" class="form-control" />
     </div>
+    <div class="mb-3">
+        <label asp-for="PhoneNumber" class="form-label"></label>
+        <input asp-for="PhoneNumber" class="form-control" type="tel" autocomplete="tel" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
     <button type="submit" class="btn btn-primary w-100 py-3 mb-2">Сохранить</button>
 </form>
 

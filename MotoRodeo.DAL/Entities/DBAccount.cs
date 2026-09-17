@@ -78,6 +78,12 @@ public class DBAccount : IEntityBase, ISoftDeleteEntity, IEntityWithDateCreated
     public string? Vehicle { get; set; }
 
     /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    [MaxLength(32)]
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
     /// Набор прав пользователя.
     /// </summary>
     public virtual ICollection<DBAccountRight> AccountRights { get; set; } = new List<DBAccountRight>();

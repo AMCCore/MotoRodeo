@@ -41,6 +41,7 @@ public sealed class GetAccountDetailsQueryHandler(
                     .Select(l => l.Login)
                     .FirstOrDefault() ?? string.Empty,
                 Vehicle = x.Vehicle,
+                PhoneNumber = x.PhoneNumber,
                 Confirmed = x.Confirmed,
                 IsBlocked = x.IsBlocked,
                 DateCreated = x.DateCreated,

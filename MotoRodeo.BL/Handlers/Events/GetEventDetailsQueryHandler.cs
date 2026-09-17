@@ -95,6 +95,7 @@ public sealed class GetEventDetailsQueryHandler(
             Id = p.Id,
             AccountId = p.AccountId,
             Name = AccountDisplay.Format(p.Account),
+            PhoneNumber = p.Account.PhoneNumber,
             Status = p.Status,
             UsesOwnEquipment = p.UsesOwnEquipment,
             DateCreated = p.DateCreated,

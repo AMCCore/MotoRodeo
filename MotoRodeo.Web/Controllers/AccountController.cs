@@ -115,6 +115,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
                 form.Email,
                 form.Password,
                 form.Vehicle,
+                form.PhoneNumber,
                 id => Url.Action(
                     nameof(ConfirmRegistration),
                     "Account",
@@ -250,7 +251,8 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
                 form.FirstName,
                 form.LastName,
                 form.Nickname,
-                form.Vehicle), token);
+                form.Vehicle,
+                form.PhoneNumber), token);
 
             form.Info = "Профиль сохранён.";
             return View(form);
@@ -309,7 +311,8 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
         LastName = profile.LastName,
         Nickname = profile.Nickname,
         Email = profile.Email,
-        Vehicle = profile.Vehicle
+        Vehicle = profile.Vehicle,
+        PhoneNumber = profile.PhoneNumber
     };
 
     private async Task SignInAsync(Guid accountId, bool persistent, CancellationToken token)

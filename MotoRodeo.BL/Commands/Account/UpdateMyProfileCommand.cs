@@ -9,4 +9,10 @@ namespace MotoRodeo.BL.Commands.Account;
 /// <param name="LastName">Фамилия.</param>
 /// <param name="Nickname">Прозвище.</param>
 /// <param name="Vehicle">Транспортное средство.</param>
-public sealed record UpdateMyProfileCommand(string FirstName, string LastName, string? Nickname, string? Vehicle) : IRequest;
+/// <param name="PhoneNumber">Номер телефона.</param>
+public sealed record UpdateMyProfileCommand(
+    string FirstName,
+    string LastName,
+    string? Nickname,
+    string? Vehicle,
+    string? PhoneNumber) : IRequest;

@@ -11,6 +11,7 @@ namespace MotoRodeo.BL.Commands.Account;
 /// <param name="Email">Электронная почта (логин).</param>
 /// <param name="Password">Пароль в открытом виде.</param>
 /// <param name="Vehicle">Транспортное средство.</param>
+/// <param name="PhoneNumber">Номер телефона.</param>
 /// <param name="ConfirmationLinkFactory">Фабрика абсолютной ссылки подтверждения по Id учётной записи.</param>
 public sealed record RegisterUserCommand(
     string FirstName,
@@ -19,4 +20,5 @@ public sealed record RegisterUserCommand(
     string Email,
     string Password,
     string? Vehicle,
+    string? PhoneNumber,
     Func<Guid, string> ConfirmationLinkFactory) : IRequest;

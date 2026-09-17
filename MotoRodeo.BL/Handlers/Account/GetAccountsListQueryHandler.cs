@@ -42,7 +42,8 @@ public sealed class GetAccountsListQueryHandler(
                     .FirstOrDefault() ?? string.Empty,
                 Confirmed = x.Confirmed,
                 IsBlocked = x.IsBlocked,
-                Vehicle = x.Vehicle
+                Vehicle = x.Vehicle,
+                PhoneNumber = x.PhoneNumber
             })
             .ToListAsync(cancellationToken);
 

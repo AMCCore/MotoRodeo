@@ -28,6 +28,11 @@ public sealed class EventParticipantDto
     public ParticipantStatusEnum Status { get; set; }
 
     /// <summary>
+    /// Номер телефона участника.
+    /// </summary>
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
     /// true — своя техника; false — аренда организатора.
     /// </summary>
     public bool UsesOwnEquipment { get; set; }

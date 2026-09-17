@@ -44,6 +44,14 @@ public sealed class ProfileForm
     public string? Vehicle { get; set; }
 
     /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    [Display(Name = "Номер телефона")]
+    [DataType(DataType.PhoneNumber)]
+    [MaxLength(32)]
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
     /// Сообщение об ошибке.
     /// </summary>
     public string? Error { get; set; }

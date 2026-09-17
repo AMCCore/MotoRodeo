@@ -6,7 +6,7 @@
 
 <div class="mb-3">
     <label for="user-search" class="form-label">Поиск</label>
-    <input id="user-search" type="search" class="form-control" placeholder="Имя, фамилия, прозвище или email" autocomplete="off" />
+    <input id="user-search" type="search" class="form-control" placeholder="Имя, фамилия, прозвище, email или телефон" autocomplete="off" />
 </div>
 
 @if (Model.Count == 0)
@@ -24,7 +24,8 @@ else
                data-firstname="@user.FirstName"
                data-lastname="@user.LastName"
                data-nickname="@(user.Nickname ?? "")"
-               data-email="@user.Email">
+               data-email="@user.Email"
+               data-phone="@(user.PhoneNumber ?? "")">
                 <div class="d-flex justify-content-between align-items-start gap-2">
                     <div>
                         <div class="fw-semibold">@user.LastName @user.FirstName</div>
@@ -33,6 +34,10 @@ else
                             <div class="small text-muted">@user.Nickname</div>
                         }
                         <div class="small">@user.Email</div>
+                        @if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+                        {
+                            <div class="small">@user.PhoneNumber</div>
+                        }
                     </div>
                     <div class="text-end">
                         @if (user.IsBlocked)
@@ -75,7 +80,8 @@ else
                         row.dataset.firstname,
                         row.dataset.lastname,
                         row.dataset.nickname,
-                        row.dataset.email
+                        row.dataset.email,
+                        row.dataset.phone
                     ].map(normalize).join(' ');
                     const show = !q || haystack.includes(q);
                     row.classList.toggle('d-none', !show);

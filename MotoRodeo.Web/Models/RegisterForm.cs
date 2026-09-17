@@ -38,6 +38,14 @@ public sealed class RegisterForm
     public string? Vehicle { get; set; }
 
     /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    [Display(Name = "Номер телефона")]
+    [DataType(DataType.PhoneNumber)]
+    [MaxLength(32)]
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
     /// Электронная почта (логин).
     /// </summary>
     [Required]

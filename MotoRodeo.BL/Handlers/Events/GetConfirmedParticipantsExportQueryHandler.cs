@@ -57,7 +57,10 @@ public sealed class GetConfirmedParticipantsExportQueryHandler(
                 DisplayName = FormatExportName(p.Account),
                 Motorcycle = p.UsesOwnEquipment
                     ? (string.IsNullOrWhiteSpace(p.Account.Vehicle) ? "—" : p.Account.Vehicle.Trim())
-                    : "аренда"
+                    : "аренда",
+                PhoneNumber = string.IsNullOrWhiteSpace(p.Account.PhoneNumber)
+                    ? "—"
+                    : p.Account.PhoneNumber.Trim()
             })
             .ToList();
 

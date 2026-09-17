@@ -148,6 +148,10 @@ else if (!Model.RegistrationOpen)
                     <div class="fw-semibold">@p.Name</div>
                     <div class="small text-muted mb-2">
                         Статус: @StatusLabel(p.Status) · Техника: @(p.UsesOwnEquipment ? "своя" : "аренда")
+                        @if (!string.IsNullOrWhiteSpace(p.PhoneNumber))
+                        {
+                            <text> · Телефон: @p.PhoneNumber</text>
+                        }
                     </div>
                     @if (p.CanConfirm || p.CanReject)
                     {

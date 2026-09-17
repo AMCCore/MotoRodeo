@@ -27,6 +27,7 @@ public sealed class UpdateMyProfileCommandHandler(
         var lastName = request.LastName.Trim();
         var nickname = string.IsNullOrWhiteSpace(request.Nickname) ? null : request.Nickname.Trim();
         var vehicle = string.IsNullOrWhiteSpace(request.Vehicle) ? null : request.Vehicle.Trim();
+        var phoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
 
         logger.LogInformation("Обновление профиля. AccountId={AccountId}", security.CurrentAccountId);
 
@@ -51,6 +52,7 @@ public sealed class UpdateMyProfileCommandHandler(
         account.LastName = lastName;
         account.Login = nickname;
         account.Vehicle = vehicle;
+        account.PhoneNumber = phoneNumber;
 
         await unitOfWork.SaveChangesAsync(token: cancellationToken);
 

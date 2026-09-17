@@ -40,4 +40,9 @@ public sealed class ConfirmedParticipantExportRowDto
     /// Мотоцикл или «аренда».
     /// </summary>
     public string Motorcycle { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    public string PhoneNumber { get; set; } = string.Empty;
 }

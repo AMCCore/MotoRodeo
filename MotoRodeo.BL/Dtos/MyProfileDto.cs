@@ -29,4 +29,9 @@ public sealed class MyProfileDto
     /// Транспортное средство.
     /// </summary>
     public string? Vehicle { get; set; }
+
+    /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    public string? PhoneNumber { get; set; }
 }

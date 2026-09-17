@@ -25,6 +25,9 @@
             <dt class="col-sm-4">Транспорт</dt>
             <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Vehicle) ? "—" : Model.Vehicle)</dd>
 
+            <dt class="col-sm-4">Телефон</dt>
+            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "—" : Model.PhoneNumber)</dd>
+
             <dt class="col-sm-4">Подтверждён</dt>
             <dd class="col-sm-8">@(Model.Confirmed ? "Да" : "Нет")</dd>
 

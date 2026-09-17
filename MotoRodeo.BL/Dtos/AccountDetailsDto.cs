@@ -43,6 +43,11 @@ public sealed class AccountDetailsDto
     public string? Vehicle { get; set; }
 
     /// <summary>
+    /// Номер телефона.
+    /// </summary>
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>
     /// Учётная запись подтверждена.
     /// </summary>
     public bool Confirmed { get; set; }

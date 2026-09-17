@@ -38,7 +38,8 @@ public sealed class GetMyProfileQueryHandler(
                     .Where(l => l.AccountLoginType == AccountLoginTypeEnum.Login)
                     .Select(l => l.Login)
                     .FirstOrDefault() ?? string.Empty,
-                Vehicle = x.Vehicle
+                Vehicle = x.Vehicle,
+                PhoneNumber = x.PhoneNumber
             })
             .SingleOrDefaultAsync(cancellationToken)
             ?? throw new KeyNotFoundException("Учётная запись не найдена.");
