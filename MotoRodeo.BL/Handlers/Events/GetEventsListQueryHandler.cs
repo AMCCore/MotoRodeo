@@ -27,6 +27,8 @@ public sealed class GetEventsListQueryHandler(
 
         var now = DateTimeOffset.UtcNow;
         var autoCompleteBefore = now - EventLifecycleRules.AutoCompleteAfter;
+        var canManageEvents = security.HasRight(AccountRightEnum.ManageEvents);
+        var currentAccountId = security.CurrentAccountId;
 
         var items = await unitOfWork.Query<DBEvent>()
             .Select(x => new EventListItemDto
@@ -36,7 +38,11 @@ public sealed class GetEventsListQueryHandler(
                 Place = x.Place,
                 EventDate = x.EventDate,
                 RegistrationClosesAt = x.RegistrationClosesAt,
-                Status = x.Status
+                Status = x.Status,
+                ConfirmedParticipantCount = x.Participants.Count(p => p.Status == ParticipantStatusEnum.Confirmed),
+                PendingApplicationCount = x.Participants.Count(p => p.Status == ParticipantStatusEnum.Draft),
+                CanViewParticipantCounts = canManageEvents
+                    || x.Judges.Any(j => j.AccountId == currentAccountId)
             })
             .ToListAsync(cancellationToken);
 

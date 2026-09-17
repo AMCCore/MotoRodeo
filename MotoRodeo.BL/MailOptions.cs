@@ -1,3 +1,5 @@
+using MailKit.Security;
+
 namespace MotoRodeo.BL;
 
 /// <summary>
@@ -5,31 +7,6 @@ namespace MotoRodeo.BL;
 /// </summary>
 public static class MailOptions
 {
-    /// <summary>
-    /// Хост SMTP-сервера.
-    /// </summary>
-    public static string SmtpHost => Environment.GetEnvironmentVariable(nameof(SmtpHost)) ?? throw new InvalidOperationException($"{nameof(SmtpHost)} is not set.");
-
-    /// <summary>
-    /// Порт SMTP-сервера.
-    /// </summary>
-    public static int SmtpPort => int.Parse(Environment.GetEnvironmentVariable(nameof(SmtpPort)) ?? "587");
-
-    /// <summary>
-    /// Логин SMTP (может быть пустым при анонимной отправке).
-    /// </summary>
-    public static string? SmtpUser => Environment.GetEnvironmentVariable(nameof(SmtpUser));
-
-    /// <summary>
-    /// Пароль SMTP.
-    /// </summary>
-    public static string? SmtpPassword => Environment.GetEnvironmentVariable(nameof(SmtpPassword));
-
-    /// <summary>
-    /// Адрес отправителя.
-    /// </summary>
-    public static string SmtpFrom => Environment.GetEnvironmentVariable(nameof(SmtpFrom)) ?? throw new InvalidOperationException($"{nameof(SmtpFrom)} is not set.");
-
     /// <summary>
     /// Отображаемое имя отправителя.
     /// </summary>
@@ -39,6 +16,16 @@ public static class MailOptions
     /// Использовать SSL/TLS при подключении к SMTP.
     /// </summary>
     public static bool SmtpUseSsl => bool.Parse(Environment.GetEnvironmentVariable(nameof(SmtpUseSsl)) ?? "true");
+
+    /// <summary>
+    /// Режим SSL/TLS для MailKit: implicit SSL на 465, иначе STARTTLS.
+    /// </summary>
+    public static SecureSocketOptions GetSecureSocketOptions(int port) =>
+        !SmtpUseSsl
+            ? SecureSocketOptions.None
+            : port == 465
+                ? SecureSocketOptions.SslOnConnect
+                : SecureSocketOptions.StartTls;
 
     /// <summary>
     /// Тема письма со ссылкой на восстановление пароля.

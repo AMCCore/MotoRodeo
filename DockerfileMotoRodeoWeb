@@ -1,0 +1,29 @@
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+USER app
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["MotoRodeo.Web/MotoRodeo.Web.csproj", "MotoRodeo.Web/"]
+COPY ["MotoRodeo.BL/MotoRodeo.BL.csproj", "MotoRodeo.BL/"]
+COPY ["MotoRodeo.DAL/MotoRodeo.DAL.csproj", "MotoRodeo.DAL/"]
+
+RUN apt-get update && apt-get install -y nodejs
+
+RUN dotnet restore "./MotoRodeo.Web/MotoRodeo.Web.csproj"
+COPY . .
+WORKDIR "/src/MotoRodeo.Web"
+RUN dotnet build "./MotoRodeo.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./MotoRodeo.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+#RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
+ENTRYPOINT ["dotnet", "MotoRodeo.Web.dll"]

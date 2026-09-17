@@ -8,7 +8,7 @@
 {
     <div class="alert alert-danger">@Model.Error</div>
 }
-<form method="post" asp-action="Edit">
+<form method="post" asp-controller="Events" asp-action="Save" asp-route-id="@Model.Id">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
     <div class="mb-3">

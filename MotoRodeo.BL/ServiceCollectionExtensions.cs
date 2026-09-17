@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
     {
         Assembly currentAssem = Assembly.GetExecutingAssembly();
 
-        services.AddSingleton<IEmailSender, MailKitEmailSender>();
+        services.AddScoped<IEmailSender, MailKitEmailSender>();
         services.AddMediatR(cfg =>
         {
             cfg.LicenseKey = LuckypennyLicenseKey;

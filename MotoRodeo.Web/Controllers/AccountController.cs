@@ -134,6 +134,7 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
             logger.LogWarning(ex, "Ошибка регистрации. Email={Email}", form.Email);
             form.Error = ex.Message;
             form.Password = string.Empty;
+            form.ConfirmPassword = string.Empty;
             return View(form);
         }
     }
@@ -169,6 +170,33 @@ public class AccountController(IMediator mediator, ILogger<AccountController> lo
                 Message = "Не удалось подтвердить регистрацию."
             });
         }
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("ConfirmPasswordReset/{ResetRequestId}")]
+    public async Task<IActionResult> ConfirmPasswordReset(Guid ResetRequestId, CancellationToken token = default)
+    {
+        logger.LogInformation("Начало процедуры сброса пароля. ResetRequestId={ResetRequestId}", ResetRequestId);
+        try
+        {
+            await mediator.Send(new ConfirmPasswordResetCommand(ResetRequestId), token);
+            return View(nameof(ConfirmRegistration), new ConfirmRegistrationModel
+            {
+                Success = true,
+                Message = "Пароль для данного пользователя сброшен и отправлен ему на email указанный при регистрации."
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Ошибка процедуры сброса пароля. ResetRequestId={ResetRequestId}", ResetRequestId);
+            return View(nameof(ConfirmRegistration), new ConfirmRegistrationModel
+            {
+                Success = false,
+                Message = "Не удалось сбросить пароль. Попробуйте позже."
+            });
+        }
+
     }
 
 

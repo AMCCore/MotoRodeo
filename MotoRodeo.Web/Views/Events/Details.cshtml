@@ -3,11 +3,18 @@
     ViewData["Title"] = Model.Title;
     string StatusLabel(ParticipantStatusEnum s) => s switch
     {
-        ParticipantStatusEnum.Draft => "Новая",
-        ParticipantStatusEnum.Confirmed => "Подтверждён",
+        ParticipantStatusEnum.Draft => "Заявлен",
+        ParticipantStatusEnum.Confirmed => "Согласован",
         ParticipantStatusEnum.Rejected => "Отклонён",
         _ => s.ToString()
     };
+    var participantGroups = new (string Title, IReadOnlyList<EventParticipantDto> Items)[]
+    {
+        ("Заявленные", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Draft).ToList()),
+        ("Согласованные", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Confirmed).ToList()),
+        ("Отклонённые", Model.Participants.Where(p => p.Status == ParticipantStatusEnum.Rejected).ToList())
+    };
+    var cancelConfirmMessage = $"Вы уверены что хотите отменить мероприятие {Model.Title} ({AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM")})?";
 }
 <div class="d-flex justify-content-between align-items-start mb-3 gap-2 flex-wrap">
     <h1 class="h4 mb-0">@Model.Title</h1>
@@ -23,8 +30,8 @@
     <div class="card-body">
         <p class="mb-1"><strong>Статус:</strong> @Model.StatusDisplayLabel</p>
         <p class="mb-1"><strong>Место:</strong> @Model.Place</p>
-        <p class="mb-1"><strong>Дата:</strong> @Model.EventDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
-        <p class="mb-0"><strong>Регистрация до:</strong> @Model.RegistrationClosesAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+        <p class="mb-1"><strong>Дата:</strong> @AppTimeZone.ToLocal(Model.EventDate).ToString("dd.MM.yyyy HH:mm")</p>
+        <p class="mb-0"><strong>Регистрация до:</strong> @AppTimeZone.ToLocal(Model.RegistrationClosesAt).ToString("dd.MM.yyyy HH:mm")</p>
     </div>
 </div>
 
@@ -51,8 +58,7 @@
         }
         @if (Model.CanCancelEvent)
         {
-            <form method="post" asp-action="Cancel"
-                  onsubmit="return confirm('Отменить мероприятие? Оно будет переведено в завершённые.');">
+            <form method="post" asp-action="Cancel" class="js-confirm-form" data-confirm-message="@cancelConfirmMessage">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="eventId" value="@Model.Id" />
                 <button type="submit" class="btn btn-outline-danger w-100 py-3">Отменить мероприятие</button>
@@ -183,3 +189,54 @@ else if (!Model.RegistrationOpen)
 }
 
 <a class="btn btn-outline-secondary w-100 py-3" asp-action="Index">К списку событий</a>
+
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-labelledby="confirmActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmActionModalLabel">Подтверждение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body" id="confirmActionModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmActionModalSubmit">Да</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        var pendingForm = null;
+        var modalEl = document.getElementById('confirmActionModal');
+        if (!modalEl) return;
+
+        var modalBody = document.getElementById('confirmActionModalBody');
+        var submitBtn = document.getElementById('confirmActionModalSubmit');
+        var modal = new bootstrap.Modal(modalEl);
+
+        document.querySelectorAll('form.js-confirm-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                pendingForm = form;
+                modalBody.textContent = form.getAttribute('data-confirm-message') || 'Подтвердите действие.';
+                modal.show();
+            });
+        });
+
+        submitBtn.addEventListener('click', function () {
+            if (!pendingForm) return;
+            var form = pendingForm;
+            pendingForm = null;
+            modal.hide();
+            HTMLFormElement.prototype.submit.call(form);
+        });
+
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            pendingForm = null;
+        });
+    })();
+</script>
+}
